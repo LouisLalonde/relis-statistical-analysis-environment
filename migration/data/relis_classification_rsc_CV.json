@@ -1,0 +1,546 @@
+[
+  {
+    "publication_year": {
+      "title": "Publication year",
+      "value": 2016,
+      "type": "Continuous",
+      "multiple": false
+    },
+    "venue": {
+      "title": "Venue",
+      "value": "",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "search_type": {
+      "title": "Search Type",
+      "value": "",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "domain": {
+      "title": "Domain",
+      "value": "Artificial Intelligence",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "transformation_language": {
+      "title": "Transformation Language",
+      "value": "ATL | Henshin",
+      "type": "Nominal",
+      "multiple": true
+    },
+    "source_language": {
+      "title": "Source language",
+      "value": "UML",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "target_language": {
+      "title": "Target language",
+      "value": "Java",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "scope": {
+      "title": "Scope",
+      "value": "Exogenous | Outplace",
+      "type": "Nominal",
+      "multiple": true
+    },
+    "industrial": {
+      "title": "Industrial",
+      "value": "Yes",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "bidirectional": {
+      "title": "Bidirectional",
+      "value": "Yes",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "targeted_year": {
+      "title": "Targeted year",
+      "value": 2013,
+      "type": "Continuous",
+      "multiple": false
+    }
+  },
+  {
+    "publication_year": {
+      "title": "Publication year",
+      "value": 2018,
+      "type": "Continuous",
+      "multiple": false
+    },
+    "venue": {
+      "title": "Venue",
+      "value": "",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "search_type": {
+      "title": "Search Type",
+      "value": "",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "domain": {
+      "title": "Domain",
+      "value": "Collaborative system",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "transformation_language": {
+      "title": "Transformation Language",
+      "value": "Henshin",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "source_language": {
+      "title": "Source language",
+      "value": "SySML",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "target_language": {
+      "title": "Target language",
+      "value": "Java",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "scope": {
+      "title": "Scope",
+      "value": "Inplace",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "industrial": {
+      "title": "Industrial",
+      "value": "No",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "bidirectional": {
+      "title": "Bidirectional",
+      "value": "Yes",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "targeted_year": {
+      "title": "Targeted year",
+      "value": 2010,
+      "type": "Continuous",
+      "multiple": false
+    }
+  },
+  {
+    "publication_year": {
+      "title": "Publication year",
+      "value": 2016,
+      "type": "Continuous",
+      "multiple": false
+    },
+    "venue": {
+      "title": "Venue",
+      "value": "",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "search_type": {
+      "title": "Search Type",
+      "value": "",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "domain": {
+      "title": "Domain",
+      "value": "Collaborative system",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "transformation_language": {
+      "title": "Transformation Language",
+      "value": "QVT",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "source_language": {
+      "title": "Source language",
+      "value": "DSL",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "target_language": {
+      "title": "Target language",
+      "value": "Java",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "scope": {
+      "title": "Scope",
+      "value": "Exogenous",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "industrial": {
+      "title": "Industrial",
+      "value": "No",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "bidirectional": {
+      "title": "Bidirectional",
+      "value": "Yes",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "targeted_year": {
+      "title": "Targeted year",
+      "value": 2012,
+      "type": "Continuous",
+      "multiple": false
+    }
+  },
+  {
+    "publication_year": {
+      "title": "Publication year",
+      "value": 2016,
+      "type": "Continuous",
+      "multiple": false
+    },
+    "venue": {
+      "title": "Venue",
+      "value": "",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "search_type": {
+      "title": "Search Type",
+      "value": "",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "domain": {
+      "title": "Domain",
+      "value": "Compilation",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "transformation_language": {
+      "title": "Transformation Language",
+      "value": "ATL",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "source_language": {
+      "title": "Source language",
+      "value": "DSL",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "target_language": {
+      "title": "Target language",
+      "value": "DSL",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "scope": {
+      "title": "Scope",
+      "value": "Inplace",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "industrial": {
+      "title": "Industrial",
+      "value": "Yes",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "bidirectional": {
+      "title": "Bidirectional",
+      "value": "No",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "targeted_year": {
+      "title": "Targeted year",
+      "value": 2011,
+      "type": "Continuous",
+      "multiple": false
+    }
+  },
+  {
+    "publication_year": {
+      "title": "Publication year",
+      "value": 2019,
+      "type": "Continuous",
+      "multiple": false
+    },
+    "venue": {
+      "title": "Venue",
+      "value": "",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "search_type": {
+      "title": "Search Type",
+      "value": "",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "domain": {
+      "title": "Domain",
+      "value": "Compilation",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "transformation_language": {
+      "title": "Transformation Language",
+      "value": "Henshin | MoTiF",
+      "type": "Nominal",
+      "multiple": true
+    },
+    "source_language": {
+      "title": "Source language",
+      "value": "SySML",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "target_language": {
+      "title": "Target language",
+      "value": "Java",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "scope": {
+      "title": "Scope",
+      "value": "Outplace",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "industrial": {
+      "title": "Industrial",
+      "value": "Yes",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "bidirectional": {
+      "title": "Bidirectional",
+      "value": "Yes",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "targeted_year": {
+      "title": "Targeted year",
+      "value": 2011,
+      "type": "Continuous",
+      "multiple": false
+    }
+  },
+  {
+    "publication_year": {
+      "title": "Publication year",
+      "value": 2016,
+      "type": "Continuous",
+      "multiple": false
+    },
+    "venue": {
+      "title": "Venue",
+      "value": "",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "search_type": {
+      "title": "Search Type",
+      "value": "",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "domain": {
+      "title": "Domain",
+      "value": "Artificial Intelligence",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "transformation_language": {
+      "title": "Transformation Language",
+      "value": "Henshin",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "source_language": {
+      "title": "Source language",
+      "value": "Java",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "target_language": {
+      "title": "Target language",
+      "value": "UML",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "scope": {
+      "title": "Scope",
+      "value": "Inplace",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "industrial": {
+      "title": "Industrial",
+      "value": "No",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "bidirectional": {
+      "title": "Bidirectional",
+      "value": "No",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "targeted_year": {
+      "title": "Targeted year",
+      "value": 0,
+      "type": "Continuous",
+      "multiple": false
+    }
+  },
+  {
+    "publication_year": {
+      "title": "Publication year",
+      "value": 2017,
+      "type": "Continuous",
+      "multiple": false
+    },
+    "venue": {
+      "title": "Venue",
+      "value": "",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "search_type": {
+      "title": "Search Type",
+      "value": "",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "domain": {
+      "title": "Domain",
+      "value": "Collaborative system",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "transformation_language": {
+      "title": "Transformation Language",
+      "value": "Henshin",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "source_language": {
+      "title": "Source language",
+      "value": "Java",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "target_language": {
+      "title": "Target language",
+      "value": "Java",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "scope": {
+      "title": "Scope",
+      "value": "Inplace",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "industrial": {
+      "title": "Industrial",
+      "value": "Yes",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "bidirectional": {
+      "title": "Bidirectional",
+      "value": "Yes",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "targeted_year": {
+      "title": "Targeted year",
+      "value": 2015,
+      "type": "Continuous",
+      "multiple": false
+    }
+  },
+  {
+    "publication_year": {
+      "title": "Publication year",
+      "value": 2016,
+      "type": "Continuous",
+      "multiple": false
+    },
+    "venue": {
+      "title": "Venue",
+      "value": "",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "search_type": {
+      "title": "Search Type",
+      "value": "",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "domain": {
+      "title": "Domain",
+      "value": "",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "transformation_language": {
+      "title": "Transformation Language",
+      "value": "",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "source_language": {
+      "title": "Source language",
+      "value": "",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "target_language": {
+      "title": "Target language",
+      "value": "",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "scope": {
+      "title": "Scope",
+      "value": "",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "industrial": {
+      "title": "Industrial",
+      "value": "",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "bidirectional": {
+      "title": "Bidirectional",
+      "value": "",
+      "type": "Nominal",
+      "multiple": false
+    },
+    "targeted_year": {
+      "title": "Targeted year",
+      "value": "",
+      "type": "Continuous",
+      "multiple": false
+    }
+  }
+]

@@ -1,0 +1,9 @@
+nbr,Key,Title,Publication year,Author/s,Venue,Source,Search Type,Reviewer/s,Transformation name,Domain,Transformation Language,Source language,Target language,Scope,Intent,Intent relation,Industrial,Bidirectional,Number of citations,Targeted year,Note
+1,,,2016,,,,,,Model-Driven Data Migration 2,Artificial Intelligence,ATL | Henshin,UML,Java,Exogenous | Outplace,Composition | Migration,,Yes,Yes,2,2013,
+2,,,2018,,,,,,Test1,Collaborative system,Henshin,SySML,Java,Inplace,,,No,Yes,10,2010,
+3,,,2016,,,,,,testtt,Collaborative system,QVT,DSL,Java,Exogenous,,,No,Yes,5,2012,
+4,,,2016,,,,,,Model-Driven 2,Compilation,ATL,DSL,DSL,Inplace,,,Yes,No,8,2011,
+5,,,2019,,,,,,Test 4,Compilation,Henshin | MoTiF,SySML,Java,Outplace,,,Yes,Yes,80,2011,
+6,,,2016,,,,,,sdjkhksd,Artificial Intelligence,Henshin,Java,UML,Inplace,Migration,,No,No,60,0,
+7,,,2017,,,,,,Biderectional,Collaborative system,Henshin,Java,Java,Inplace,,,Yes,Yes,23,2015,test
+943,,,2016,,,,,,,,,,,,,,,,,,
