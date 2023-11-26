@@ -1,4 +1,4 @@
-# relis-statistical-functions
+# relis-statistical-templates
 
 ## 🔍 Overview
 
