@@ -203,7 +203,7 @@ generate_stacked_bar_plot <- function(data, config_file, i, j) {
     return(p)
 }
 
-# Function to generate grouped bar plots
+# Function to generate grouped bar plots    
 generate_grouped_bar_plot <- function(data, config_file, i, j) {
     subset_data <- beautify_data(data, config_file, i, j)
 

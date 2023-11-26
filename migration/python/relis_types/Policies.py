@@ -2,4 +2,4 @@ from enum import Enum
 
 
 class Policies(Enum):
-    DROPNA = False
+    DROP_NA = False

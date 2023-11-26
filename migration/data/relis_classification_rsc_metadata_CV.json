@@ -1,68 +1,57 @@
-[
-    {
-        "name": "publication_year",
+{
+    "publication_year": {
         "title": "Publication year",
         "type": "Continuous",
         "multiple": false
     },
-    {
-        "name": "venue",
+    "venue": {
         "title": "Venue",
         "type": "Nominal",
         "multiple": false
     },
-    {
-        "name": "search_type",
+    "search_type": {
         "title": "Search Type",
         "type": "Nominal",
         "multiple": false
     },
-    {
-        "name": "domain",
+    "domain": {
         "title": "Domain",
         "type": "Nominal",
         "multiple": false
     },
-    {
-        "name": "transformation_language",
+    "transformation_language": {
         "title": "Transformation Language",
         "type": "Nominal",
         "multiple": true
     },
-    {
-        "name": "source_language",
+    "source_language": {
         "title": "Source language",
         "type": "Nominal",
         "multiple": false
     },
-    {
-        "name": "target_language",
+    "target_language": {
         "title": "Target language",
         "type": "Nominal",
         "multiple": false
     },
-    {
-        "name": "scope",
+    "scope": {
         "title": "Scope",
         "type": "Nominal",
         "multiple": true
     },
-    {
-        "name": "industrial",
+    "industrial": {
         "title": "Industrial",
         "type": "Nominal",
         "multiple": false
     },
-    {
-        "name": "bidirectional",
+    "bidirectional": {
         "title": "Bidirectional",
         "type": "Nominal",
         "multiple": false
     },
-    {
-        "name": "targeted_year",
+    "targeted_year": {
         "title": "Targeted year",
         "type": "Continuous",
         "multiple": false
     }
-]
+}

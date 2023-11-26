@@ -19,7 +19,7 @@ class Multivalue(Enum):
     SEPARATOR = '|'
 
 class Policies(Enum):
-    DROPNA = False
+    DROP_NA = False
 
 ### Types
 
@@ -107,7 +107,7 @@ continuous_data = pd.DataFrame([filter_row_by_field_type(paper, FieldClassificat
 nominal = NominalDataFrame(nominal_data, NominalVariables)
 continuous = ContinuousDataFrame(continuous_data, ContinuousVariables)
 
-if (Policies.DROPNA.value):
+if (Policies.DROP_NA.value):
     removeEmptyStrings(nominal.data)
     removeEmptyStrings(continuous.data)
 
@@ -134,12 +134,15 @@ def beautify_data_desc(field_name: str, data: pd.DataFrame):
 
 ## Frequency tables
 
-desc_distr_vector = {NominalVariables[field_name]: beautify_data_desc(field_name, nominal.data)
+def generate_desc_frequency_table(field_name: str, data: pd.DataFrame):
+    return beautify_data_desc(field_name, data)
+
+desc_frequency_tables = {NominalVariables[field_name]:  generate_desc_frequency_table(field_name, nominal.data)
                       for field_name in nominal.data.columns}
 
 ## Bar plots
 
-def generate_bar_plot(field_name: str, data: pd.DataFrame):
+def generate_desc_bar_plot(field_name: str, data: pd.DataFrame):
     df = beautify_data_desc(field_name, data)
     
     if (len(df) == 0): return
@@ -162,19 +165,19 @@ def generate_bar_plot(field_name: str, data: pd.DataFrame):
 
     return fig
 
-bar_plot_vector = {NominalVariables[field_name]: generate_bar_plot(field_name, nominal.data)
+desc_bar_plots = {NominalVariables[field_name]: generate_desc_bar_plot(field_name, nominal.data)
                     for field_name in nominal.data.columns}
 
 ## Statistics
 
-def generate_statistics(field_name: str, data: pd.DataFrame):
+def generate_desc_statistics(field_name: str, data: pd.DataFrame):
     series =  data[field_name]
     
     series.replace('', np.nan, inplace=True)
     
     if (len(data) == 0): return
 
-    nan_policy = 'omit' if Policies.DROPNA.value else 'propagate'
+    nan_policy = 'omit' if Policies.DROP_NA.value else 'propagate'
     results = {
     "vars": 1,
     "n": series.count(),
@@ -192,12 +195,12 @@ def generate_statistics(field_name: str, data: pd.DataFrame):
     }
     return results
 
-statistics_vector = {ContinuousVariables[field_name]: generate_statistics(field_name, continuous.data)
+desc_statistics = {ContinuousVariables[field_name]: generate_desc_statistics(field_name, continuous.data)
                       for field_name in continuous.data.columns}
 
 ## Box Plots
 
-def generate_box_plot(field_name: str, data: pd.DataFrame):
+def generate_desc_box_plot(field_name: str, data: pd.DataFrame):
     series = data[field_name]
 
     variable = get_variable(field_name, ContinuousVariables)
@@ -220,12 +223,12 @@ def generate_box_plot(field_name: str, data: pd.DataFrame):
 
     return fig
 
-box_plot_vector = {ContinuousVariables[field_name]: generate_box_plot(field_name, continuous.data)
+desc_box_plots = {ContinuousVariables[field_name]: generate_desc_box_plot(field_name, continuous.data)
                     for field_name in continuous.data.columns}
 
 ## Violin Plots
 
-def generate_violin_plot(field_name: str, data: pd.DataFrame):
+def generate_desc_violin_plot(field_name: str, data: pd.DataFrame):
     series = data[field_name]
     
     variable = get_variable(field_name, ContinuousVariables)
@@ -240,7 +243,7 @@ def generate_violin_plot(field_name: str, data: pd.DataFrame):
 
     return fig
 
-violin_plot_vector = {ContinuousVariables[field_name]: generate_violin_plot(field_name, continuous.data)
+desc_violin_plots = {ContinuousVariables[field_name]: generate_desc_violin_plot(field_name, continuous.data)
                        for field_name in continuous.data.columns}
 
 ### EVOLUTIVE STATS
@@ -267,7 +270,7 @@ def beautify_data_evo(field_name: str, publication_year: pd.Series, variable: Va
 
 ## Frequency tables
 
-def expand_data(field_name: str, publication_year: pd.Series, data: pd.DataFrame):
+def generate_evo_frequency_table(field_name: str, publication_year: pd.Series, data: pd.DataFrame):
     variable = get_variable(field_name, NominalVariables)
 
     subset_data = beautify_data_evo(field_name, publication_year, variable, data)
@@ -280,7 +283,7 @@ def expand_data(field_name: str, publication_year: pd.Series, data: pd.DataFrame
 
     return subset_data 
 
-evo_distr_vector = {NominalVariables[field_name]: expand_data(field_name, continuous.data["publication_year"], nominal.data)
+evo_frequency_tables = {NominalVariables[field_name]: generate_evo_frequency_table(field_name, continuous.data["publication_year"], nominal.data)
                        for field_name in nominal.data.columns}
 
 ## Evolution Plots
@@ -301,7 +304,7 @@ def generate_evo_plot(field_name: str, publication_year: pd.Series, data: pd.Dat
     plt.grid(True)
     return fig
 
-evolution_plot_vector = {NominalVariables[field_name]: generate_evo_plot(field_name, continuous.data["publication_year"], nominal.data)
+evo_plots = {NominalVariables[field_name]: generate_evo_plot(field_name, continuous.data["publication_year"], nominal.data)
                           for field_name in nominal.data.columns}
 
 ### COMPARATIVE STATS
@@ -345,19 +348,19 @@ def evaluate_comparative_dependency_field(field_name: str, dataFrame: DataFrame,
 
 ## Frequency Tables
 
-def generate_comparative_violin_plot(field_name: str, dependency_field_name: str, data: pd.DataFrame):
+def generate_comp_frequency_table(field_name: str, dependency_field_name: str, data: pd.DataFrame):
     variable = get_variable(field_name, NominalVariables)
     dependency_variable = get_variable(dependency_field_name, NominalVariables)
 
     return beautify_data_comp(field_name, dependency_field_name,
                                       variable, dependency_variable, data)
 
-comp_distr_vector = {NominalVariables[field_name]: evaluate_comparative_dependency_field(field_name, nominal, generate_comparative_violin_plot)
+comp_frequency_tables = {NominalVariables[field_name]: evaluate_comparative_dependency_field(field_name, nominal, generate_comp_frequency_table)
                        for field_name in nominal.data.columns}
 
 ## Bar Plots
 
-def generate_stacked_bar_plot(field_name: str, dependency_field_name: str, data: pd.DataFrame):
+def generate_comp_stacked_bar_plot(field_name: str, dependency_field_name: str, data: pd.DataFrame):
     variable = get_variable(field_name, NominalVariables)
     dependency_variable = get_variable(dependency_field_name, NominalVariables)
 
@@ -388,12 +391,12 @@ def generate_stacked_bar_plot(field_name: str, dependency_field_name: str, data:
 
     return fig
 
-stacked_bar_plot_vector = {NominalVariables[field_name]: evaluate_comparative_dependency_field(field_name, nominal, generate_stacked_bar_plot)
+comp_stacked_bar_plots = {NominalVariables[field_name]: evaluate_comparative_dependency_field(field_name, nominal, generate_comp_stacked_bar_plot)
                        for field_name in nominal.data.columns}
 
 ## Grouped Bar Plots
 
-def generate_grouped_bar_plot(field_name: str, dependency_field_name: str, data: pd.DataFrame):
+def generate_comp_grouped_bar_plot(field_name: str, dependency_field_name: str, data: pd.DataFrame):
     variable = get_variable(field_name, NominalVariables)
     dependency_variable = get_variable(dependency_field_name, NominalVariables)
 
@@ -411,12 +414,12 @@ def generate_grouped_bar_plot(field_name: str, dependency_field_name: str, data:
 
     return fig
 
-grouped_bar_plot_vector = {NominalVariables[field_name]: evaluate_comparative_dependency_field(field_name, nominal, generate_grouped_bar_plot)
+comp_grouped_bar_plots = {NominalVariables[field_name]: evaluate_comparative_dependency_field(field_name, nominal, generate_comp_grouped_bar_plot)
                        for field_name in nominal.data.columns}
 
 ## Bubble Charts
 
-def generate_bubble_chart(field_name: str, dependency_field_name: str, data: pd.DataFrame):
+def generate_comp_bubble_chart(field_name: str, dependency_field_name: str, data: pd.DataFrame):
     variable = get_variable(field_name, NominalVariables)
     dependency_variable = get_variable(dependency_field_name, NominalVariables)
 
@@ -436,12 +439,12 @@ def generate_bubble_chart(field_name: str, dependency_field_name: str, data: pd.
 
     return fig
 
-bubble_chart_vector = {NominalVariables[field_name]: evaluate_comparative_dependency_field(field_name, nominal, generate_bubble_chart)
+comp_bubble_charts = {NominalVariables[field_name]: evaluate_comparative_dependency_field(field_name, nominal, generate_comp_bubble_chart)
                        for field_name in nominal.data.columns}
 
 ## Fisher's Exact Test
 
-def fisher_exact_test(field_name: str, dependency_field_name: str, data: pd.DataFrame):
+def generate_comp_fisher_exact_test(field_name: str, dependency_field_name: str, data: pd.DataFrame):
     variable = get_variable(field_name, NominalVariables)
     dependency_variable = get_variable(dependency_field_name, NominalVariables)
 
@@ -464,26 +467,26 @@ def fisher_exact_test(field_name: str, dependency_field_name: str, data: pd.Data
     # return fisher_result
     return fisher_result
 
-fisher_exact_test_vector = {NominalVariables[field_name]: evaluate_comparative_dependency_field(field_name, nominal, fisher_exact_test)
+comp_fisher_exact_tests = {NominalVariables[field_name]: evaluate_comparative_dependency_field(field_name, nominal, generate_comp_fisher_exact_test)
                        for field_name in nominal.data.columns}
 
 ## Shapiro Wilk's Correlation Test
 
-def shapiro_wilk_test(field_name: str, continuous_df: pd.DataFrame):
+def generate_comp_shapiro_wilk_test(field_name: str, continuous_df: pd.DataFrame):
     subset_data = continuous_df[field_name].fillna(0)
 
     shapiro_result = shapiro(subset_data)
 
     return shapiro_result
 
-shapiro_wilk_test_vector = {ContinuousVariables[field_name]: shapiro_wilk_test(field_name, continuous.data)
+comp_shapiro_wilk_tests = {ContinuousVariables[field_name]: generate_comp_shapiro_wilk_test(field_name, continuous.data)
                           for field_name in continuous.data.columns}
 
 ## Pearson's Correlation Test
 
-def pearson_cor_test(field_name: str, dependency_field_name: str, data: pd.DataFrame):
-    _, pvalue = shapiro_wilk_test_vector[ContinuousVariables[field_name]]
-    _, dpvalue = shapiro_wilk_test_vector[ContinuousVariables[dependency_field_name]]
+def generate_comp_pearson_cor_test(field_name: str, dependency_field_name: str, data: pd.DataFrame):
+    _, pvalue = comp_shapiro_wilk_tests[ContinuousVariables[field_name]]
+    _, dpvalue = comp_shapiro_wilk_tests[ContinuousVariables[dependency_field_name]]
 
     if not (pvalue > 0.05 and dpvalue > 0.05): return
     
@@ -492,14 +495,14 @@ def pearson_cor_test(field_name: str, dependency_field_name: str, data: pd.DataF
 
     return pearson_coefficient, p_value
 
-pearson_cor_test_vector = {ContinuousVariables[field_name]: evaluate_comparative_dependency_field(field_name, continuous, pearson_cor_test)
+comp_pearson_cor_tests = {ContinuousVariables[field_name]: evaluate_comparative_dependency_field(field_name, continuous, generate_comp_pearson_cor_test)
                        for field_name in continuous.data.columns}
 
 ## Spearman's Correlation Test
 
-def spearman_cor_test(field_name: str, dependency_field_name: str, data: pd.DataFrame):
-    _, pvalue = shapiro_wilk_test_vector[ContinuousVariables[field_name]]
-    _, dpvalue = shapiro_wilk_test_vector[ContinuousVariables[dependency_field_name]]
+def generate_comp_spearman_cor_test(field_name: str, dependency_field_name: str, data: pd.DataFrame):
+    _, pvalue = comp_shapiro_wilk_tests[ContinuousVariables[field_name]]
+    _, dpvalue = comp_shapiro_wilk_tests[ContinuousVariables[dependency_field_name]]
 
     if  pvalue > 0.05 and dpvalue > 0.05: return
   
@@ -508,5 +511,5 @@ def spearman_cor_test(field_name: str, dependency_field_name: str, data: pd.Data
 
     return spearman_result
 
-spearman_cor_test_vector = {ContinuousVariables[field_name]: evaluate_comparative_dependency_field(field_name, continuous, spearman_cor_test)
+comp_spearman_cor_tests = {ContinuousVariables[field_name]: evaluate_comparative_dependency_field(field_name, continuous, generate_comp_spearman_cor_test)
                        for field_name in continuous.data.columns}
