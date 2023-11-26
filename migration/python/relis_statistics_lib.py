@@ -1,5 +1,4 @@
 import re
-import json
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -64,8 +63,8 @@ class ContinuousDataFrame(DataFrame):
 
 ### Shared
 
-def removeEmptyStrings(df: pd.DataFrame):
-    df.replace('', np.nan, inplace=True)
+def substituteNan(df: pd.DataFrame) -> None:
+    df.replace(np.nan, '', inplace=True)
 
 def get_variable(field_name: str, variables) -> Variable:
     return variables[field_name].value
@@ -89,27 +88,24 @@ def display_figure(plt, bool: bool):
 
 ### Data
 
-## Parsing (only for demonstration purposes)
+## Parsing
 
-with open('../data/relis_classification_rsc_CV.json', 'r', encoding='utf8') as f:
-   classification_data: list[dict[str, str]] =  json.loads(f.read())
+project_classification_data = pd.read_csv('../data/relis_classification_CV.csv', encoding='utf8')
+
+nominal_variables = {nominal_variable.value.title: nominal_variable.name for nominal_variable in NominalVariables}
+continious_variables = {continious_variable.value.title: continious_variable.name for continious_variable in ContinuousVariables}
 
 ## Preprocessing
 
-# Split config file based on data type
-def filter_row_by_field_type(paper, field_type):
-    pd_row = {key: value["value"] for key, value in paper.items() if value['type'] == field_type}
-    return pd_row
+nominal_data = project_classification_data[nominal_variables.keys()].rename(columns=nominal_variables)
+continuous_data = project_classification_data[continious_variables.keys()].rename(columns=continious_variables)
 
-nominal_data = pd.DataFrame([filter_row_by_field_type(paper, FieldClassificationType.NOMINAL.value) for paper in classification_data])
-continuous_data = pd.DataFrame([filter_row_by_field_type(paper, FieldClassificationType.CONTINUOUS.value) for paper in classification_data])
+if (not Policies.DROP_NA.value):
+    substituteNan(nominal_data)
+    substituteNan(continuous_data)
 
 nominal = NominalDataFrame(nominal_data, NominalVariables)
 continuous = ContinuousDataFrame(continuous_data, ContinuousVariables)
-
-if (Policies.DROP_NA.value):
-    removeEmptyStrings(nominal.data)
-    removeEmptyStrings(continuous.data)
 
 ### DESCRIPTIVE STATS
 
@@ -119,7 +115,7 @@ def beautify_data_desc(field_name: str, data: pd.DataFrame):
     # Get metadata
     variable = get_variable(field_name, NominalVariables)
 
-    # Split the values by the "|" character and flatten the result
+    # Split the values by the multivalue character and flatten the result
     split_values = process_multiple_values(data[field_name], variable.multiple)
     flattened_values = np.concatenate(split_values)
 
@@ -302,6 +298,7 @@ def generate_evo_plot(field_name: str, publication_year: pd.Series, data: pd.Dat
     plt.xlabel('Year')
     plt.ylabel('Frequency')
     plt.grid(True)
+    
     return fig
 
 evo_plots = {NominalVariables[field_name]: generate_evo_plot(field_name, continuous.data["publication_year"], nominal.data)
