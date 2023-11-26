@@ -93,12 +93,12 @@ def display_figure(plt, bool: bool):
 project_classification_data = pd.read_csv('../data/relis_classification_CV.csv', encoding='utf8')
 
 nominal_variables = {nominal_variable.value.title: nominal_variable.name for nominal_variable in NominalVariables}
-continious_variables = {continious_variable.value.title: continious_variable.name for continious_variable in ContinuousVariables}
+continuous_variables = {continuous_variable.value.title: continuous_variable.name for continuous_variable in ContinuousVariables}
 
 ## Preprocessing
 
 nominal_data = project_classification_data[nominal_variables.keys()].rename(columns=nominal_variables)
-continuous_data = project_classification_data[continious_variables.keys()].rename(columns=continious_variables)
+continuous_data = project_classification_data[continuous_variables.keys()].rename(columns=continuous_variables)
 
 if (not Policies.DROP_NA.value):
     substituteNan(nominal_data)
@@ -298,7 +298,7 @@ def generate_evo_plot(field_name: str, publication_year: pd.Series, data: pd.Dat
     plt.xlabel('Year')
     plt.ylabel('Frequency')
     plt.grid(True)
-    
+
     return fig
 
 evo_plots = {NominalVariables[field_name]: generate_evo_plot(field_name, continuous.data["publication_year"], nominal.data)
