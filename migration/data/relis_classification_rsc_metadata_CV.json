@@ -1,0 +1,68 @@
+[
+    {
+        "name": "publication_year",
+        "title": "Publication year",
+        "type": "Continuous",
+        "multiple": false
+    },
+    {
+        "name": "venue",
+        "title": "Venue",
+        "type": "Nominal",
+        "multiple": false
+    },
+    {
+        "name": "search_type",
+        "title": "Search Type",
+        "type": "Nominal",
+        "multiple": false
+    },
+    {
+        "name": "domain",
+        "title": "Domain",
+        "type": "Nominal",
+        "multiple": false
+    },
+    {
+        "name": "transformation_language",
+        "title": "Transformation Language",
+        "type": "Nominal",
+        "multiple": true
+    },
+    {
+        "name": "source_language",
+        "title": "Source language",
+        "type": "Nominal",
+        "multiple": false
+    },
+    {
+        "name": "target_language",
+        "title": "Target language",
+        "type": "Nominal",
+        "multiple": false
+    },
+    {
+        "name": "scope",
+        "title": "Scope",
+        "type": "Nominal",
+        "multiple": true
+    },
+    {
+        "name": "industrial",
+        "title": "Industrial",
+        "type": "Nominal",
+        "multiple": false
+    },
+    {
+        "name": "bidirectional",
+        "title": "Bidirectional",
+        "type": "Nominal",
+        "multiple": false
+    },
+    {
+        "name": "targeted_year",
+        "title": "Targeted year",
+        "type": "Continuous",
+        "multiple": false
+    }
+]
