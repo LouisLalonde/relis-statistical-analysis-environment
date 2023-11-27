@@ -1,4 +1,5 @@
 import re
+import statistics
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -80,8 +81,25 @@ def process_multiple_values(values: pd.Series, multiple: bool):
 
     return values.apply(lambda x: [x])
 
-def display_data(dataFrame: pd.DataFrame, bool: bool):
-    if bool: print(dataFrame)
+def dataFrameGetTitle(statistic_type: str, statistic_name: str,
+                          field_name: str, dependency_field_name = None):
+    
+    base_str =  f"{statistic_type} | {statistic_name} : {field_name}"
+
+    if dependency_field_name: base_str += f"->{dependency_field_name}"
+
+    return {'title': base_str}
+
+def dataFrameUpdateTitle(dataFrame: pd.DataFrame, object: dict):
+    dataFrame.attrs.update(object)
+
+def display_data(dataFrame: pd.DataFrame | None, bool: bool):
+    if type(dataFrame) != pd.DataFrame:
+        print("No data... Nothing to show")
+    elif bool:
+        if dataFrame.attrs.get('title'): print(dataFrame.attrs.get('title'))
+        print(dataFrame.to_markdown())
+        print("\n")
 
 def display_figure(plt, bool: bool):
     if bool: plt.show()
@@ -131,7 +149,11 @@ def beautify_data_desc(field_name: str, data: pd.DataFrame):
 ## Frequency tables
 
 def generate_desc_frequency_table(field_name: str, data: pd.DataFrame):
-    return beautify_data_desc(field_name, data)
+    subset_data = beautify_data_desc(field_name, data)
+
+    dataFrameUpdateTitle(subset_data, dataFrameGetTitle('Descriptive', 'Frequency tables', field_name))
+
+    return subset_data
 
 desc_frequency_tables = {NominalVariables[field_name]:  generate_desc_frequency_table(field_name, nominal.data)
                       for field_name in nominal.data.columns}
@@ -174,6 +196,7 @@ def generate_desc_statistics(field_name: str, data: pd.DataFrame):
     if (len(data) == 0): return
 
     nan_policy = 'omit' if Policies.DROP_NA.value else 'propagate'
+
     results = {
     "vars": 1,
     "n": series.count(),
@@ -189,7 +212,12 @@ def generate_desc_statistics(field_name: str, data: pd.DataFrame):
     "kurtosis": kurtosis(series, nan_policy=nan_policy, fisher=True),
     "se": series.std() / np.sqrt(series.count())  
     }
-    return results
+
+    subset_data = pd.DataFrame(results, index=[0])
+
+    dataFrameUpdateTitle(subset_data, dataFrameGetTitle('Descriptive', 'Statistics', field_name))
+
+    return subset_data
 
 desc_statistics = {ContinuousVariables[field_name]: generate_desc_statistics(field_name, continuous.data)
                       for field_name in continuous.data.columns}
@@ -277,6 +305,8 @@ def generate_evo_frequency_table(field_name: str, publication_year: pd.Series, d
     subset_data.columns.name = None
     subset_data.reset_index(inplace=True)
 
+    dataFrameUpdateTitle(subset_data, dataFrameGetTitle('Evolutive', 'Frequency tables', field_name))
+
     return subset_data 
 
 evo_frequency_tables = {NominalVariables[field_name]: generate_evo_frequency_table(field_name, continuous.data["publication_year"], nominal.data)
@@ -349,8 +379,12 @@ def generate_comp_frequency_table(field_name: str, dependency_field_name: str, d
     variable = get_variable(field_name, NominalVariables)
     dependency_variable = get_variable(dependency_field_name, NominalVariables)
 
-    return beautify_data_comp(field_name, dependency_field_name,
+    subset_data = beautify_data_comp(field_name, dependency_field_name,
                                       variable, dependency_variable, data)
+    
+    dataFrameUpdateTitle(subset_data, dataFrameGetTitle('Comparative', 'Frequency tables', field_name, dependency_field_name))
+
+    return subset_data
 
 comp_frequency_tables = {NominalVariables[field_name]: evaluate_comparative_dependency_field(field_name, nominal, generate_comp_frequency_table)
                        for field_name in nominal.data.columns}
@@ -461,8 +495,13 @@ def generate_comp_fisher_exact_test(field_name: str, dependency_field_name: str,
     # Perform Fisher's Exact Test
     fisher_result = fisher_exact(contingency_table, simulate_pval=True)
 
-    # return fisher_result
-    return fisher_result
+    subset_data = pd.DataFrame({
+        'p-value': fisher_result
+    }, index=[0])
+
+    dataFrameUpdateTitle(subset_data, dataFrameGetTitle('Comparative', "Fisher's Exact Test", field_name, dependency_field_name))
+
+    return subset_data
 
 comp_fisher_exact_tests = {NominalVariables[field_name]: evaluate_comparative_dependency_field(field_name, nominal, generate_comp_fisher_exact_test)
                        for field_name in nominal.data.columns}
@@ -474,7 +513,16 @@ def generate_comp_shapiro_wilk_test(field_name: str, continuous_df: pd.DataFrame
 
     shapiro_result = shapiro(subset_data)
 
-    return shapiro_result
+    statistics, pvalue =  shapiro_result
+
+    subset_data = pd.DataFrame({
+        'statistics': statistics,
+        'p-value': pvalue
+    }, index=[0])
+
+    dataFrameUpdateTitle(subset_data, dataFrameGetTitle('Comparative', "Shapiro Wilk's Correlation Test", field_name))
+
+    return subset_data
 
 comp_shapiro_wilk_tests = {ContinuousVariables[field_name]: generate_comp_shapiro_wilk_test(field_name, continuous.data)
                           for field_name in continuous.data.columns}
@@ -482,15 +530,22 @@ comp_shapiro_wilk_tests = {ContinuousVariables[field_name]: generate_comp_shapir
 ## Pearson's Correlation Test
 
 def generate_comp_pearson_cor_test(field_name: str, dependency_field_name: str, data: pd.DataFrame):
-    _, pvalue = comp_shapiro_wilk_tests[ContinuousVariables[field_name]]
-    _, dpvalue = comp_shapiro_wilk_tests[ContinuousVariables[dependency_field_name]]
+    p_value = comp_shapiro_wilk_tests[ContinuousVariables[field_name]]['p-value'][0]
+    dp_value = comp_shapiro_wilk_tests[ContinuousVariables[dependency_field_name]]['p-value'][0]
 
-    if not (pvalue > 0.05 and dpvalue > 0.05): return
+    if not (p_value > 0.05 and dp_value > 0.05): return
     
     # Perform Pearson's correlation test
     pearson_coefficient, p_value = pearsonr(data[field_name].fillna(0), data[dependency_field_name].fillna(0))
 
-    return pearson_coefficient, p_value
+    subset_data = pd.DataFrame({
+        'pearson coefficient': pearson_coefficient,
+        'p-value': p_value
+    }, index=[0])
+
+    dataFrameUpdateTitle(subset_data, dataFrameGetTitle('Comparative', "Pearson's Correlation Test", field_name))
+
+    return subset_data
 
 comp_pearson_cor_tests = {ContinuousVariables[field_name]: evaluate_comparative_dependency_field(field_name, continuous, generate_comp_pearson_cor_test)
                        for field_name in continuous.data.columns}
@@ -498,15 +553,22 @@ comp_pearson_cor_tests = {ContinuousVariables[field_name]: evaluate_comparative_
 ## Spearman's Correlation Test
 
 def generate_comp_spearman_cor_test(field_name: str, dependency_field_name: str, data: pd.DataFrame):
-    _, pvalue = comp_shapiro_wilk_tests[ContinuousVariables[field_name]]
-    _, dpvalue = comp_shapiro_wilk_tests[ContinuousVariables[dependency_field_name]]
-
-    if  pvalue > 0.05 and dpvalue > 0.05: return
+    p_value = comp_shapiro_wilk_tests[ContinuousVariables[field_name]]['p-value'][0]
+    dp_value = comp_shapiro_wilk_tests[ContinuousVariables[dependency_field_name]]['p-value'][0]
+    
+    if  p_value > 0.05 and dp_value > 0.05: return
   
     # Perform Spearman's correlation test
     spearman_result = spearmanr(data[field_name].fillna(0), data[dependency_field_name].fillna(0))
 
-    return spearman_result
+    subset_data = pd.DataFrame({
+        'statistic': spearman_result.statistic, # type: ignore
+        'p-value': spearman_result.pvalue # type: ignore
+    }, index=[0])
+
+    dataFrameUpdateTitle(subset_data, dataFrameGetTitle('Comparative', "Spearman's Correlation Test", field_name))
+   
+    return subset_data
 
 comp_spearman_cor_tests = {ContinuousVariables[field_name]: evaluate_comparative_dependency_field(field_name, continuous, generate_comp_spearman_cor_test)
                        for field_name in continuous.data.columns}
