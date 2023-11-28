@@ -182,12 +182,12 @@ desc_frequency_tables = {NominalVariables[field_name]:  generate_desc_frequency_
 def generate_desc_bar_plot(field_name: str, data: pd.DataFrame):
     df = beautify_data_desc(field_name, data)
     
-    if (len(df) == 0): return
+    if df.empty: return
 
     # Create the plot
     fig, ax = plt.subplots(figsize=(10, 6))
     hue = 'n'
-    sns.barplot(data=df, x='value', y='percentage', hue=hue, dodge=False)
+    sns.barplot(data=df, x='value', y='percentage', hue=hue, dodge=False) # type: ignore
 
     # Get metadata
     variable = get_variable(field_name, NominalVariables)
@@ -213,7 +213,7 @@ def generate_desc_statistics(field_name: str, data: pd.DataFrame):
 
     df_title = dataFrameGetTitle('Descriptive', 'Statistics', field_name)
     
-    if (len(data) == 0): return create_empty_dataframe(df_title, dataFrameUpdateTitle)
+    if data.empty: return create_empty_dataframe(df_title, dataFrameUpdateTitle)
 
     nan_policy = 'omit' if Policies.DROP_NA.value else 'propagate'
     results = {
@@ -337,6 +337,8 @@ def generate_evo_plot(field_name: str, publication_year: pd.Series, data: pd.Dat
     
     subset_data = beautify_data_evo(field_name, publication_year, variable, data)
 
+    if subset_data.empty: return
+
     # Create a plot
     fig, ax = plt.subplots(figsize=(10, 6))
     hue = 'Value'
@@ -402,7 +404,7 @@ def generate_comp_frequency_table(field_name: str, dependency_field_name: str, d
     subset_data = beautify_data_comp(field_name, dependency_field_name,
                                       variable, dependency_variable, data)
     
-    dataFrameUpdateTitle(subset_data, dataFrameGetTitle('Comparative', 'Frequency tables', field_name, dependency_field_name))
+    dataFrameUpdateTitle(subset_data, dataFrameGetTitle('Comparative', 'Frequency tables', field_name, dependency_variable.title))
 
     return subset_data
 
@@ -438,7 +440,7 @@ def generate_comp_stacked_bar_plot(field_name: str, dependency_field_name: str, 
     plt.title(f"{variable.title} and {dependency_variable.title} ~ Stacked bar plot")
     plt.xlabel(variable.title)
     plt.ylabel('Frequency')
-    configureSeabornLegend(dependency_field_name, ax, plt)
+    configureSeabornLegend(dependency_variable.title, ax, plt)
 
     return fig
 
@@ -457,12 +459,12 @@ def generate_comp_grouped_bar_plot(field_name: str, dependency_field_name: str, 
     if subset_data.empty: return
 
     fig, ax = plt.subplots(figsize=(10, 6))
-    sns.barplot(x=field_name, y='Frequency', hue=dependency_field_name, data=subset_data, dodge=True)
+    sns.barplot(x=field_name, y='Frequency', hue=dependency_field_name, data=subset_data, dodge=False) # type: ignore
 
     plt.title(f"{variable.title} and {dependency_variable.title} ~ Grouped bar plot")
     plt.gca().set_xlabel('')
     plt.ylabel('Frequency')
-    configureSeabornLegend(dependency_field_name, ax, plt)
+    configureSeabornLegend(dependency_variable.title, ax, plt)
 
     return fig
 
