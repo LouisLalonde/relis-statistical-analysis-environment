@@ -1,5 +1,4 @@
 import re
-import statistics
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -14,6 +13,10 @@ from scipy.stats import kurtosis, skew, shapiro, spearmanr, pearsonr
 ### Config
 
 plt.rcParams['figure.max_open_warning'] = 0
+
+custom = {"axes.edgecolor": "black", "grid.linestyle": "dashed", "grid.color": "grey"}
+
+sns.set_style("darkgrid", rc = custom)
 
 class Multivalue(Enum):
     SEPARATOR = '|'
@@ -165,12 +168,10 @@ def generate_desc_bar_plot(field_name: str, data: pd.DataFrame):
     
     if (len(df) == 0): return
 
-    # Set the theme
-    sns.set_theme(style="whitegrid")
-
     # Create the plot
     fig, ax = plt.subplots(figsize=(10, 6))
-    sns.barplot(data=df, x="value", y="percentage", hue="n")
+    hue = "n"
+    sns.barplot(data=df, x="value", y="percentage", hue=hue, dodge=False)
 
     # Get metadata
     variable = get_variable(field_name, NominalVariables)
@@ -180,6 +181,8 @@ def generate_desc_bar_plot(field_name: str, data: pd.DataFrame):
     plt.title(title)
     plt.xlabel(variable.title)
     plt.ylabel("Percentage")
+    plt.legend(bbox_to_anchor=(1, 1), loc='upper left', title=hue)
+    plt.gca().get_legend().get_frame().set_edgecolor('black')
 
     return fig
 
@@ -196,7 +199,6 @@ def generate_desc_statistics(field_name: str, data: pd.DataFrame):
     if (len(data) == 0): return
 
     nan_policy = 'omit' if Policies.DROP_NA.value else 'propagate'
-
     results = {
     "vars": 1,
     "n": series.count(),
@@ -242,7 +244,6 @@ def generate_desc_box_plot(field_name: str, data: pd.DataFrame):
     plt.title(title)
     plt.ylabel(variable.title)
     plt.xlabel('')
-
     plt.gca().yaxis.set_major_formatter(ticker.FormatStrFormatter('%0.0f'))
 
     return fig
@@ -321,13 +322,16 @@ def generate_evo_plot(field_name: str, publication_year: pd.Series, data: pd.Dat
 
     # Create a plot
     fig, ax = plt.subplots(figsize=(10, 6))
-    sns.lineplot(data=subset_data, x='Year', y='Frequency', hue='Value', style='Value', markers=True)
+    hue = 'Value'
+    sns.lineplot(data=subset_data, x='Year', y='Frequency', hue=hue, style='Value', markers=True)
 
     # Setting title, labels, and theme
     plt.title(f"{variable.title} ~ Evolution plot")
     plt.xlabel('Year')
     plt.ylabel('Frequency')
     plt.grid(True)
+    plt.legend(bbox_to_anchor=(1, 1), loc='upper left', title=hue)
+    plt.gca().get_legend().get_frame().set_edgecolor('black')
 
     return fig
 
@@ -418,7 +422,8 @@ def generate_comp_stacked_bar_plot(field_name: str, dependency_field_name: str, 
     plt.title(f"{variable.title} and {dependency_variable.title} ~ Stacked bar plot")
     plt.xlabel(variable.title)
     plt.ylabel('Frequency')
-    plt.legend(title=dependency_field_name)
+    plt.legend(bbox_to_anchor=(1, 1), loc='upper left', title=dependency_field_name)
+    plt.gca().get_legend().get_frame().set_edgecolor('black')
 
     return fig
 
@@ -442,6 +447,8 @@ def generate_comp_grouped_bar_plot(field_name: str, dependency_field_name: str, 
     plt.title(f"{variable.title} and {dependency_variable.title} ~ Grouped bar plot")
     plt.gca().set_xlabel('')
     plt.ylabel('Frequency')
+    plt.legend(bbox_to_anchor=(1, 1), loc='upper left', title=dependency_field_name)
+    plt.gca().get_legend().get_frame().set_edgecolor('black')
 
     return fig
 
@@ -461,12 +468,15 @@ def generate_comp_bubble_chart(field_name: str, dependency_field_name: str, data
 
     # Creating the bubble chart
     fig, ax = plt.subplots(figsize=(10, 6))
-    sns.scatterplot(data=subset_data, x=field_name, y=dependency_field_name, size='Frequency', color='black')
+    size = 'Frequency'
+    sns.scatterplot(data=subset_data, x=field_name, y=dependency_field_name, size=size, color='black')
 
     # Adding labels and title
     plt.title(f"{variable.title} and {dependency_variable.title} ~ Bubble Chart")
     plt.gca().set_xlabel('')
     plt.gca().set_ylabel('')
+    plt.legend(bbox_to_anchor=(1, 1), loc='upper left', title=size)
+    plt.gca().get_legend().get_frame().set_edgecolor('black')
 
     return fig
 
