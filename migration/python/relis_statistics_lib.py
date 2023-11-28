@@ -6,9 +6,8 @@ import matplotlib.pyplot as plt
 from enum import Enum
 from typing import Type
 from matplotlib import ticker
-from FisherExact import fisher_exact
 from statsmodels.robust.scale import mad
-from scipy.stats import kurtosis, skew, shapiro, spearmanr, pearsonr 
+from scipy.stats import kurtosis, skew, shapiro, spearmanr, pearsonr, chi2_contingency
 
 ### Config
 
@@ -485,7 +484,7 @@ comp_bubble_charts = {NominalVariables[field_name]: evaluate_comparative_depende
 
 ## Fisher's Exact Test
 
-def generate_comp_fisher_exact_test(field_name: str, dependency_field_name: str, data: pd.DataFrame):
+def generate_comp_chi_squared_test(field_name: str, dependency_field_name: str, data: pd.DataFrame):
     variable = get_variable(field_name, NominalVariables)
     dependency_variable = get_variable(dependency_field_name, NominalVariables)
 
@@ -494,26 +493,24 @@ def generate_comp_fisher_exact_test(field_name: str, dependency_field_name: str,
 
     if subset_data.empty: return
 
-    # Check for the condition where there's only one row and both variables are NaN
+    # Check for the condition where both variables are NaN
     if len(subset_data) == 1 and pd.isna(subset_data[field_name]).all() and pd.isna(subset_data[dependency_field_name]).all():
         return
 
     # Create contingency table
     contingency_table = pd.crosstab(subset_data[field_name], subset_data[dependency_field_name],
                                      values=subset_data['Frequency'], aggfunc='sum', dropna=False).fillna(0)
-
-    # Perform Fisher's Exact Test
-    fisher_result = fisher_exact(contingency_table, simulate_pval=True)
+   
+    # Calculating the Chi-squared statistic
+    chi2_result = chi2_contingency(contingency_table)
 
     subset_data = pd.DataFrame({
-        'p-value': fisher_result
+        'p-value': chi2_result.pvalue # type: ignore
     }, index=[0])
-
-    dataFrameUpdateTitle(subset_data, dataFrameGetTitle('Comparative', "Fisher's Exact Test", field_name, dependency_field_name))
 
     return subset_data
 
-comp_fisher_exact_tests = {NominalVariables[field_name]: evaluate_comparative_dependency_field(field_name, nominal, generate_comp_fisher_exact_test)
+chi2_exact_test_vector = {NominalVariables[field_name]: evaluate_comparative_dependency_field(field_name, nominal, generate_comp_chi_squared_test)
                        for field_name in nominal.data.columns}
 
 ## Shapiro Wilk's Correlation Test
