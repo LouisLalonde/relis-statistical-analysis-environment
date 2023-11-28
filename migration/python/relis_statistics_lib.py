@@ -87,10 +87,16 @@ def dataFrameGetTitle(statistic_type: str, statistic_name: str,
                           field_name: str, dependency_field_name = None):
     
     base_str =  f"{statistic_type} | {statistic_name} : {field_name}"
-
     if dependency_field_name: base_str += f"->{dependency_field_name}"
-
     return {'title': base_str}
+
+
+def configureSeabornLegend(title: str, ax, plt):
+    handles, labels = ax.get_legend_handles_labels()
+
+    if handles:
+        plt.legend(bbox_to_anchor=(1, 1), loc='upper left', title=title)
+        plt.gca().get_legend().get_frame().set_edgecolor('black')
 
 def dataFrameUpdateTitle(dataFrame: pd.DataFrame, object: dict):
     dataFrame.attrs.update(object)
@@ -180,8 +186,7 @@ def generate_desc_bar_plot(field_name: str, data: pd.DataFrame):
     plt.title(title)
     plt.xlabel(variable.title)
     plt.ylabel("Percentage")
-    plt.legend(bbox_to_anchor=(1, 1), loc='upper left', title=hue)
-    plt.gca().get_legend().get_frame().set_edgecolor('black')
+    configureSeabornLegend(hue, ax, plt)
 
     return fig
 
@@ -329,8 +334,7 @@ def generate_evo_plot(field_name: str, publication_year: pd.Series, data: pd.Dat
     plt.xlabel('Year')
     plt.ylabel('Frequency')
     plt.grid(True)
-    plt.legend(bbox_to_anchor=(1, 1), loc='upper left', title=hue)
-    plt.gca().get_legend().get_frame().set_edgecolor('black')
+    configureSeabornLegend(hue, ax, plt)
 
     return fig
 
@@ -392,7 +396,7 @@ def generate_comp_frequency_table(field_name: str, dependency_field_name: str, d
 comp_frequency_tables = {NominalVariables[field_name]: evaluate_comparative_dependency_field(field_name, nominal, generate_comp_frequency_table)
                        for field_name in nominal.data.columns}
 
-## Bar Plots
+## Stacked Bar Plots
 
 def generate_comp_stacked_bar_plot(field_name: str, dependency_field_name: str, data: pd.DataFrame):
     variable = get_variable(field_name, NominalVariables)
@@ -421,8 +425,7 @@ def generate_comp_stacked_bar_plot(field_name: str, dependency_field_name: str, 
     plt.title(f"{variable.title} and {dependency_variable.title} ~ Stacked bar plot")
     plt.xlabel(variable.title)
     plt.ylabel('Frequency')
-    plt.legend(bbox_to_anchor=(1, 1), loc='upper left', title=dependency_field_name)
-    plt.gca().get_legend().get_frame().set_edgecolor('black')
+    configureSeabornLegend(dependency_field_name, ax, plt)
 
     return fig
 
@@ -446,8 +449,7 @@ def generate_comp_grouped_bar_plot(field_name: str, dependency_field_name: str, 
     plt.title(f"{variable.title} and {dependency_variable.title} ~ Grouped bar plot")
     plt.gca().set_xlabel('')
     plt.ylabel('Frequency')
-    plt.legend(bbox_to_anchor=(1, 1), loc='upper left', title=dependency_field_name)
-    plt.gca().get_legend().get_frame().set_edgecolor('black')
+    configureSeabornLegend(dependency_field_name, ax, plt)
 
     return fig
 
@@ -474,8 +476,7 @@ def generate_comp_bubble_chart(field_name: str, dependency_field_name: str, data
     plt.title(f"{variable.title} and {dependency_variable.title} ~ Bubble Chart")
     plt.gca().set_xlabel('')
     plt.gca().set_ylabel('')
-    plt.legend(bbox_to_anchor=(1, 1), loc='upper left', title=size)
-    plt.gca().get_legend().get_frame().set_edgecolor('black')
+    configureSeabornLegend(size, ax, plt)
 
     return fig
 
@@ -510,7 +511,7 @@ def generate_comp_chi_squared_test(field_name: str, dependency_field_name: str, 
 
     return subset_data
 
-chi2_exact_test_vector = {NominalVariables[field_name]: evaluate_comparative_dependency_field(field_name, nominal, generate_comp_chi_squared_test)
+comp_chi_squared_tests = {NominalVariables[field_name]: evaluate_comparative_dependency_field(field_name, nominal, generate_comp_chi_squared_test)
                        for field_name in nominal.data.columns}
 
 ## Shapiro Wilk's Correlation Test
