@@ -13,9 +13,9 @@ from scipy.stats import kurtosis, skew, shapiro, spearmanr, pearsonr, chi2_conti
 
 plt.rcParams['figure.max_open_warning'] = 0
 
-custom = {"axes.edgecolor": "black", "grid.linestyle": "dashed", "grid.color": "grey"}
+custom = {'axes.edgecolor': 'black', 'grid.linestyle': 'dashed', 'grid.color': 'grey'}
 
-sns.set_style("darkgrid", rc = custom)
+sns.set_style('darkgrid', rc = custom)
 
 class Multivalue(Enum):
     SEPARATOR = '|'
@@ -37,19 +37,19 @@ class Variable:
         self.multiple = multiple
 
 class NominalVariables(Enum):
-    venue = Variable("venue", "Venue", FieldClassificationType.NOMINAL, False)
-    search_type = Variable("search_type", "Search Type", FieldClassificationType.NOMINAL, False)
-    domain = Variable("domain", "Domain", FieldClassificationType.NOMINAL, False)
-    transformation_language = Variable("transformation_language", "Transformation Language", FieldClassificationType.NOMINAL, True)
-    source_language = Variable("source_language", "Source language", FieldClassificationType.NOMINAL, False)
-    target_language = Variable("target_language", "Target language", FieldClassificationType.NOMINAL, False)
-    scope = Variable("scope", "Scope", FieldClassificationType.NOMINAL, True)
-    industrial = Variable("industrial", "Industrial", FieldClassificationType.NOMINAL, False)
-    bidirectional = Variable("bidirectional", "Bidirectional", FieldClassificationType.NOMINAL, False)
+    venue = Variable('venue', 'Venue', FieldClassificationType.NOMINAL, False)
+    search_type = Variable('search_type', 'Search Type', FieldClassificationType.NOMINAL, False)
+    domain = Variable('domain', 'Domain', FieldClassificationType.NOMINAL, False)
+    transformation_language = Variable('transformation_language', 'Transformation Language', FieldClassificationType.NOMINAL, True)
+    source_language = Variable('source_language', 'Source language', FieldClassificationType.NOMINAL, False)
+    target_language = Variable('target_language', 'Target language', FieldClassificationType.NOMINAL, False)
+    scope = Variable('scope', 'Scope', FieldClassificationType.NOMINAL, True)
+    industrial = Variable('industrial', 'Industrial', FieldClassificationType.NOMINAL, False)
+    bidirectional = Variable('bidirectional', 'Bidirectional', FieldClassificationType.NOMINAL, False)
 
 class ContinuousVariables(Enum):
-    publication_year = Variable("publication_year", "Publication year", FieldClassificationType.CONTINUOUS, False)
-    targeted_year = Variable("targeted_year", "Targeted year", FieldClassificationType.CONTINUOUS, False)
+    publication_year = Variable('publication_year', 'Publication year', FieldClassificationType.CONTINUOUS, False)
+    targeted_year = Variable('targeted_year', 'Targeted year', FieldClassificationType.CONTINUOUS, False)
 
 class DataFrame:
     def __init__(self, data: pd.DataFrame, variable_type: Type[NominalVariables] | Type[ContinuousVariables]):
@@ -113,12 +113,12 @@ def display_data(dataFrame: pd.DataFrame, bool: bool):
         return
     
     if dataFrame.attrs.get('title'): print(dataFrame.attrs.get('title'))
-    
+
     if dataFrame.size != 0:
         print(dataFrame.to_markdown())
     else:
-        print("No data... Nothing to show")
-    print("\n")
+        print('No data... Nothing to show')
+    print('\n')
 
 def display_figure(plt, bool: bool):
     if bool: plt.show()
@@ -186,8 +186,8 @@ def generate_desc_bar_plot(field_name: str, data: pd.DataFrame):
 
     # Create the plot
     fig, ax = plt.subplots(figsize=(10, 6))
-    hue = "n"
-    sns.barplot(data=df, x="value", y="percentage", hue=hue, dodge=False)
+    hue = 'n'
+    sns.barplot(data=df, x='value', y='percentage', hue=hue, dodge=False)
 
     # Get metadata
     variable = get_variable(field_name, NominalVariables)
@@ -196,7 +196,7 @@ def generate_desc_bar_plot(field_name: str, data: pd.DataFrame):
     title = f"{variable.title} ~ Bar plot"
     plt.title(title)
     plt.xlabel(variable.title)
-    plt.ylabel("Percentage")
+    plt.ylabel('Percentage')
     configureSeabornLegend(hue, ax, plt)
 
     return fig
@@ -217,19 +217,19 @@ def generate_desc_statistics(field_name: str, data: pd.DataFrame):
 
     nan_policy = 'omit' if Policies.DROP_NA.value else 'propagate'
     results = {
-    "vars": 1,
-    "n": series.count(),
-    "mean": series.mean(),
-    "sd": series.std(),
-    "median": series.median(),
-    "trimmed": series[series.between(series.quantile(0.25), series.quantile(0.75))].mean(),
-    "mad": mad(series),
-    "min": series.min(),
-    "max": series.max(),
-    "range": series.max() - series.min(),
-    "skew": skew(series, nan_policy=nan_policy),
-    "kurtosis": kurtosis(series, nan_policy=nan_policy, fisher=True),
-    "se": series.std() / np.sqrt(series.count())  
+    'vars': 1,
+    'n': series.count(),
+    'mean': series.mean(),
+    'sd': series.std(),
+    'median': series.median(),
+    'trimmed': series[series.between(series.quantile(0.25), series.quantile(0.75))].mean(),
+    'mad': mad(series),
+    'min': series.min(),
+    'max': series.max(),
+    'range': series.max() - series.min(),
+    'skew': skew(series, nan_policy=nan_policy),
+    'kurtosis': kurtosis(series, nan_policy=nan_policy, fisher=True),
+    'se': series.std() / np.sqrt(series.count())  
     }
 
     subset_data = pd.DataFrame(results, index=[0])
@@ -276,11 +276,11 @@ def generate_desc_violin_plot(field_name: str, data: pd.DataFrame):
     variable = get_variable(field_name, ContinuousVariables)
 
     fig, ax = plt.subplots(figsize=(10, 6))
-    sns.violinplot(data=series, color="lightgray")
+    sns.violinplot(data=series, color='lightgray')
 
     plt.title(f"{variable.title} ~ Violin plot")
     plt.ylabel(variable.title)
-    plt.xlabel("Density")
+    plt.xlabel('Density')
     plt.xticks([])
 
     return fig
@@ -366,7 +366,7 @@ def beautify_data_comp(field_name: str, dependency_field_name: str,
     })
     
     # Filtering out rows where any of the variables is empty
-    subset_data = subset_data[(subset_data[field_name] != "") & (subset_data[dependency_field_name] != "")]
+    subset_data = subset_data[(subset_data[field_name] != '') & (subset_data[dependency_field_name] != '')]
 
     # Splitting the strings and expanding into separate rows
     subset_data[field_name] = process_multiple_values(subset_data[field_name], variable.multiple)
@@ -505,7 +505,7 @@ def generate_comp_chi_squared_test(field_name: str, dependency_field_name: str, 
     subset_data = beautify_data_comp(field_name, dependency_field_name,
                                       variable, dependency_variable, data)
     
-    df_title = dataFrameGetTitle('Comparative', "Chi-squared test", field_name)
+    df_title = dataFrameGetTitle('Comparative', 'Chi-squared test', field_name)
 
     empty_df = create_empty_dataframe(df_title, dataFrameUpdateTitle)
 
