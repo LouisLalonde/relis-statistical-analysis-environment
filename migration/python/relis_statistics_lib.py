@@ -6,13 +6,16 @@ import matplotlib.pyplot as plt
 from enum import Enum
 from typing import Type
 from matplotlib import ticker
-from FisherExact import fisher_exact
 from statsmodels.robust.scale import mad
-from scipy.stats import kurtosis, skew, shapiro, spearmanr, pearsonr 
+from scipy.stats import kurtosis, skew, shapiro, spearmanr, pearsonr, chi2_contingency
 
 ### Config
 
 plt.rcParams['figure.max_open_warning'] = 0
+
+custom = {"axes.edgecolor": "black", "grid.linestyle": "dashed", "grid.color": "grey"}
+
+sns.set_style("darkgrid", rc = custom)
 
 class Multivalue(Enum):
     SEPARATOR = '|'
@@ -164,12 +167,10 @@ def generate_desc_bar_plot(field_name: str, data: pd.DataFrame):
     
     if (len(df) == 0): return
 
-    # Set the theme
-    sns.set_theme(style="whitegrid")
-
     # Create the plot
     fig, ax = plt.subplots(figsize=(10, 6))
-    sns.barplot(data=df, x="value", y="percentage", hue="n")
+    hue = "n"
+    sns.barplot(data=df, x="value", y="percentage", hue=hue, dodge=False)
 
     # Get metadata
     variable = get_variable(field_name, NominalVariables)
@@ -179,6 +180,8 @@ def generate_desc_bar_plot(field_name: str, data: pd.DataFrame):
     plt.title(title)
     plt.xlabel(variable.title)
     plt.ylabel("Percentage")
+    plt.legend(bbox_to_anchor=(1, 1), loc='upper left', title=hue)
+    plt.gca().get_legend().get_frame().set_edgecolor('black')
 
     return fig
 
@@ -195,7 +198,6 @@ def generate_desc_statistics(field_name: str, data: pd.DataFrame):
     if (len(data) == 0): return
 
     nan_policy = 'omit' if Policies.DROP_NA.value else 'propagate'
-
     results = {
     "vars": 1,
     "n": series.count(),
@@ -241,7 +243,6 @@ def generate_desc_box_plot(field_name: str, data: pd.DataFrame):
     plt.title(title)
     plt.ylabel(variable.title)
     plt.xlabel('')
-
     plt.gca().yaxis.set_major_formatter(ticker.FormatStrFormatter('%0.0f'))
 
     return fig
@@ -320,13 +321,16 @@ def generate_evo_plot(field_name: str, publication_year: pd.Series, data: pd.Dat
 
     # Create a plot
     fig, ax = plt.subplots(figsize=(10, 6))
-    sns.lineplot(data=subset_data, x='Year', y='Frequency', hue='Value', style='Value', markers=True)
+    hue = 'Value'
+    sns.lineplot(data=subset_data, x='Year', y='Frequency', hue=hue, style='Value', markers=True)
 
     # Setting title, labels, and theme
     plt.title(f"{variable.title} ~ Evolution plot")
     plt.xlabel('Year')
     plt.ylabel('Frequency')
     plt.grid(True)
+    plt.legend(bbox_to_anchor=(1, 1), loc='upper left', title=hue)
+    plt.gca().get_legend().get_frame().set_edgecolor('black')
 
     return fig
 
@@ -417,7 +421,8 @@ def generate_comp_stacked_bar_plot(field_name: str, dependency_field_name: str, 
     plt.title(f"{variable.title} and {dependency_variable.title} ~ Stacked bar plot")
     plt.xlabel(variable.title)
     plt.ylabel('Frequency')
-    plt.legend(title=dependency_field_name)
+    plt.legend(bbox_to_anchor=(1, 1), loc='upper left', title=dependency_field_name)
+    plt.gca().get_legend().get_frame().set_edgecolor('black')
 
     return fig
 
@@ -441,6 +446,8 @@ def generate_comp_grouped_bar_plot(field_name: str, dependency_field_name: str, 
     plt.title(f"{variable.title} and {dependency_variable.title} ~ Grouped bar plot")
     plt.gca().set_xlabel('')
     plt.ylabel('Frequency')
+    plt.legend(bbox_to_anchor=(1, 1), loc='upper left', title=dependency_field_name)
+    plt.gca().get_legend().get_frame().set_edgecolor('black')
 
     return fig
 
@@ -460,12 +467,15 @@ def generate_comp_bubble_chart(field_name: str, dependency_field_name: str, data
 
     # Creating the bubble chart
     fig, ax = plt.subplots(figsize=(10, 6))
-    sns.scatterplot(data=subset_data, x=field_name, y=dependency_field_name, size='Frequency', color='black')
+    size = 'Frequency'
+    sns.scatterplot(data=subset_data, x=field_name, y=dependency_field_name, size=size, color='black')
 
     # Adding labels and title
     plt.title(f"{variable.title} and {dependency_variable.title} ~ Bubble Chart")
     plt.gca().set_xlabel('')
     plt.gca().set_ylabel('')
+    plt.legend(bbox_to_anchor=(1, 1), loc='upper left', title=size)
+    plt.gca().get_legend().get_frame().set_edgecolor('black')
 
     return fig
 
@@ -474,7 +484,7 @@ comp_bubble_charts = {NominalVariables[field_name]: evaluate_comparative_depende
 
 ## Fisher's Exact Test
 
-def generate_comp_fisher_exact_test(field_name: str, dependency_field_name: str, data: pd.DataFrame):
+def generate_comp_chi_squared_test(field_name: str, dependency_field_name: str, data: pd.DataFrame):
     variable = get_variable(field_name, NominalVariables)
     dependency_variable = get_variable(dependency_field_name, NominalVariables)
 
@@ -483,26 +493,24 @@ def generate_comp_fisher_exact_test(field_name: str, dependency_field_name: str,
 
     if subset_data.empty: return
 
-    # Check for the condition where there's only one row and both variables are NaN
+    # Check for the condition where both variables are NaN
     if len(subset_data) == 1 and pd.isna(subset_data[field_name]).all() and pd.isna(subset_data[dependency_field_name]).all():
         return
 
     # Create contingency table
     contingency_table = pd.crosstab(subset_data[field_name], subset_data[dependency_field_name],
                                      values=subset_data['Frequency'], aggfunc='sum', dropna=False).fillna(0)
-
-    # Perform Fisher's Exact Test
-    fisher_result = fisher_exact(contingency_table, simulate_pval=True)
+   
+    # Calculating the Chi-squared statistic
+    chi2_result = chi2_contingency(contingency_table)
 
     subset_data = pd.DataFrame({
-        'p-value': fisher_result
+        'p-value': chi2_result.pvalue # type: ignore
     }, index=[0])
-
-    dataFrameUpdateTitle(subset_data, dataFrameGetTitle('Comparative', "Fisher's Exact Test", field_name, dependency_field_name))
 
     return subset_data
 
-comp_fisher_exact_tests = {NominalVariables[field_name]: evaluate_comparative_dependency_field(field_name, nominal, generate_comp_fisher_exact_test)
+chi2_exact_test_vector = {NominalVariables[field_name]: evaluate_comparative_dependency_field(field_name, nominal, generate_comp_chi_squared_test)
                        for field_name in nominal.data.columns}
 
 ## Shapiro Wilk's Correlation Test
