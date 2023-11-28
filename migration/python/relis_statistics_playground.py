@@ -22,7 +22,7 @@ display_figure(comp_stacked_bar_plots[NominalVariables.bidirectional][NominalVar
 
 display_figure(comp_grouped_bar_plots[NominalVariables.bidirectional][NominalVariables.domain], False)
 
-display_data(comp_chi_squared_tests[NominalVariables.domain][NominalVariables.industrial], True)
+display_data(comp_chi_squared_tests[NominalVariables.venue][NominalVariables.industrial], True)
 
 display_data(comp_spearman_cor_tests[ContinuousVariables.publication_year][ContinuousVariables.targeted_year], True)
 

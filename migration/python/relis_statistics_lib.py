@@ -75,6 +75,7 @@ def get_variable(field_name: str, variables) -> Variable:
 def split_multiple_values(value):
     if not pd.isna(value):
         return [item.strip() for item in re.split(rf'\{Multivalue.SEPARATOR.value}', value)] 
+    
     return [value]
 
 def process_multiple_values(values: pd.Series, multiple: bool):
@@ -88,8 +89,8 @@ def dataFrameGetTitle(statistic_type: str, statistic_name: str,
     
     base_str =  f"{statistic_type} | {statistic_name} : {field_name}"
     if dependency_field_name: base_str += f"->{dependency_field_name}"
-    return {'title': base_str}
 
+    return {'title': base_str}
 
 def configureSeabornLegend(title: str, ax, plt):
     handles, labels = ax.get_legend_handles_labels()
@@ -101,13 +102,23 @@ def configureSeabornLegend(title: str, ax, plt):
 def dataFrameUpdateTitle(dataFrame: pd.DataFrame, object: dict):
     dataFrame.attrs.update(object)
 
-def display_data(dataFrame: pd.DataFrame | None, bool: bool):
-    if type(dataFrame) != pd.DataFrame:
-        print("No data... Nothing to show")
-    elif bool:
-        if dataFrame.attrs.get('title'): print(dataFrame.attrs.get('title'))
+def create_empty_dataframe(title: dict[str, str], dataFrameUpdateTitle):
+    empty_df = pd.DataFrame()
+    dataFrameUpdateTitle(empty_df, title)
+
+    return empty_df
+
+def display_data(dataFrame: pd.DataFrame, bool: bool):
+    if not bool:
+        return
+    
+    if dataFrame.attrs.get('title'): print(dataFrame.attrs.get('title'))
+    
+    if dataFrame.size != 0:
         print(dataFrame.to_markdown())
-        print("\n")
+    else:
+        print("No data... Nothing to show")
+    print("\n")
 
 def display_figure(plt, bool: bool):
     if bool: plt.show()
@@ -199,8 +210,10 @@ def generate_desc_statistics(field_name: str, data: pd.DataFrame):
     series =  data[field_name]
     
     series.replace('', np.nan, inplace=True)
+
+    df_title = dataFrameGetTitle('Descriptive', 'Statistics', field_name)
     
-    if (len(data) == 0): return
+    if (len(data) == 0): return create_empty_dataframe(df_title, dataFrameUpdateTitle)
 
     nan_policy = 'omit' if Policies.DROP_NA.value else 'propagate'
     results = {
@@ -221,7 +234,7 @@ def generate_desc_statistics(field_name: str, data: pd.DataFrame):
 
     subset_data = pd.DataFrame(results, index=[0])
 
-    dataFrameUpdateTitle(subset_data, dataFrameGetTitle('Descriptive', 'Statistics', field_name))
+    dataFrameUpdateTitle(subset_data, df_title)
 
     return subset_data
 
@@ -483,7 +496,7 @@ def generate_comp_bubble_chart(field_name: str, dependency_field_name: str, data
 comp_bubble_charts = {NominalVariables[field_name]: evaluate_comparative_dependency_field(field_name, nominal, generate_comp_bubble_chart)
                        for field_name in nominal.data.columns}
 
-## Fisher's Exact Test
+## Chi-squared test
 
 def generate_comp_chi_squared_test(field_name: str, dependency_field_name: str, data: pd.DataFrame):
     variable = get_variable(field_name, NominalVariables)
@@ -491,12 +504,16 @@ def generate_comp_chi_squared_test(field_name: str, dependency_field_name: str, 
 
     subset_data = beautify_data_comp(field_name, dependency_field_name,
                                       variable, dependency_variable, data)
+    
+    df_title = dataFrameGetTitle('Comparative', "Chi-squared test", field_name)
 
-    if subset_data.empty: return
+    empty_df = create_empty_dataframe(df_title, dataFrameUpdateTitle)
+
+    if subset_data.empty: return empty_df
 
     # Check for the condition where both variables are NaN
     if len(subset_data) == 1 and pd.isna(subset_data[field_name]).all() and pd.isna(subset_data[dependency_field_name]).all():
-        return
+        return empty_df
 
     # Create contingency table
     contingency_table = pd.crosstab(subset_data[field_name], subset_data[dependency_field_name],
@@ -508,6 +525,8 @@ def generate_comp_chi_squared_test(field_name: str, dependency_field_name: str, 
     subset_data = pd.DataFrame({
         'p-value': chi2_result.pvalue # type: ignore
     }, index=[0])
+
+    dataFrameUpdateTitle(subset_data, df_title)
 
     return subset_data
 
@@ -541,7 +560,9 @@ def generate_comp_pearson_cor_test(field_name: str, dependency_field_name: str, 
     p_value = comp_shapiro_wilk_tests[ContinuousVariables[field_name]]['p-value'][0]
     dp_value = comp_shapiro_wilk_tests[ContinuousVariables[dependency_field_name]]['p-value'][0]
 
-    if not (p_value > 0.05 and dp_value > 0.05): return
+    df_title = dataFrameGetTitle('Comparative', "Pearson's Correlation Test", field_name)
+
+    if not (p_value > 0.05 and dp_value > 0.05): return create_empty_dataframe(df_title, dataFrameUpdateTitle)
     
     # Perform Pearson's correlation test
     pearson_coefficient, p_value = pearsonr(data[field_name].fillna(0), data[dependency_field_name].fillna(0))
@@ -551,7 +572,7 @@ def generate_comp_pearson_cor_test(field_name: str, dependency_field_name: str, 
         'p-value': p_value
     }, index=[0])
 
-    dataFrameUpdateTitle(subset_data, dataFrameGetTitle('Comparative', "Pearson's Correlation Test", field_name))
+    dataFrameUpdateTitle(subset_data, df_title)
 
     return subset_data
 
@@ -563,9 +584,11 @@ comp_pearson_cor_tests = {ContinuousVariables[field_name]: evaluate_comparative_
 def generate_comp_spearman_cor_test(field_name: str, dependency_field_name: str, data: pd.DataFrame):
     p_value = comp_shapiro_wilk_tests[ContinuousVariables[field_name]]['p-value'][0]
     dp_value = comp_shapiro_wilk_tests[ContinuousVariables[dependency_field_name]]['p-value'][0]
+
+    df_title = dataFrameGetTitle('Comparative', "Spearman's Correlation Test", field_name)
     
-    if  p_value > 0.05 and dp_value > 0.05: return
-  
+    if  p_value > 0.05 and dp_value > 0.05: return create_empty_dataframe(df_title, dataFrameUpdateTitle)
+
     # Perform Spearman's correlation test
     spearman_result = spearmanr(data[field_name].fillna(0), data[dependency_field_name].fillna(0))
 
@@ -574,7 +597,7 @@ def generate_comp_spearman_cor_test(field_name: str, dependency_field_name: str,
         'p-value': spearman_result.pvalue # type: ignore
     }, index=[0])
 
-    dataFrameUpdateTitle(subset_data, dataFrameGetTitle('Comparative', "Spearman's Correlation Test", field_name))
+    dataFrameUpdateTitle(subset_data, df_title)
    
     return subset_data
 
