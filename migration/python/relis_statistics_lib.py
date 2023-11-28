@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from enum import Enum
 from typing import Type
 from matplotlib import ticker
+from matplotlib.text import Text
 from statsmodels.robust.scale import mad
 from scipy.stats import kurtosis, skew, shapiro, spearmanr, pearsonr, chi2_contingency
 
@@ -108,6 +109,9 @@ def create_empty_dataframe(title: dict[str, str], dataFrameUpdateTitle):
 
     return empty_df
 
+def no_data_message():
+    return 'No data... Nothing to show'
+
 def display_data(dataFrame: pd.DataFrame, bool: bool):
     if not bool:
         return
@@ -117,11 +121,16 @@ def display_data(dataFrame: pd.DataFrame, bool: bool):
     if dataFrame.size != 0:
         print(dataFrame.to_markdown())
     else:
-        print('No data... Nothing to show')
+        print(no_data_message())
     print('\n')
 
 def display_figure(plt, bool: bool):
-    if bool: plt.show()
+    if isinstance(plt, Text):
+        print(plt.get_text())
+        print(no_data_message())
+        print('\n')
+        return
+    elif bool: plt.show()
 
 ### Data
 
@@ -181,19 +190,20 @@ desc_frequency_tables = {NominalVariables[field_name]:  generate_desc_frequency_
 
 def generate_desc_bar_plot(field_name: str, data: pd.DataFrame):
     df = beautify_data_desc(field_name, data)
-    
-    if df.empty: return
-
-    # Create the plot
-    fig, ax = plt.subplots(figsize=(10, 6))
-    hue = 'n'
-    sns.barplot(data=df, x='value', y='percentage', hue=hue, dodge=False) # type: ignore
 
     # Get metadata
     variable = get_variable(field_name, NominalVariables)
 
     # Set labels and title
     title = f"{variable.title} ~ Bar plot"
+    
+    if df.empty: return plt.title(title)
+
+    # Create the plot
+    fig, ax = plt.subplots(figsize=(10, 6))
+    hue = 'n'
+    sns.barplot(data=df, x='value', y='percentage', hue=hue, dodge=False) # type: ignore
+
     plt.title(title)
     plt.xlabel(variable.title)
     plt.ylabel('Percentage')
@@ -248,6 +258,11 @@ def generate_desc_box_plot(field_name: str, data: pd.DataFrame):
 
     variable = get_variable(field_name, ContinuousVariables)
 
+    # Set the title and labels
+    title = f"{variable.title} ~ Box plot"
+
+    if series.empty: return plt.title(title)
+
     # Create the box plot
     fig, ax = plt.subplots(figsize=(10, 6))
     sns.boxplot(data=series, color='lightblue')
@@ -256,8 +271,6 @@ def generate_desc_box_plot(field_name: str, data: pd.DataFrame):
     mean_value = series.mean()
     plt.scatter(x=0, y=mean_value, color='red', s=50, zorder=3)  # s is the size of the point
 
-    # Set the title and labels
-    title = f"{variable.title} ~ Box plot"
     plt.title(title)
     plt.ylabel(variable.title)
     plt.xlabel('')
@@ -275,10 +288,14 @@ def generate_desc_violin_plot(field_name: str, data: pd.DataFrame):
     
     variable = get_variable(field_name, ContinuousVariables)
 
+    title = f"{variable.title} ~ Violin plot"
+
+    if series.empty: return plt.title(title)
+
     fig, ax = plt.subplots(figsize=(10, 6))
     sns.violinplot(data=series, color='lightgray')
 
-    plt.title(f"{variable.title} ~ Violin plot")
+    plt.title(title)
     plt.ylabel(variable.title)
     plt.xlabel('Density')
     plt.xticks([])
@@ -337,7 +354,9 @@ def generate_evo_plot(field_name: str, publication_year: pd.Series, data: pd.Dat
     
     subset_data = beautify_data_evo(field_name, publication_year, variable, data)
 
-    if subset_data.empty: return
+    title = f"{variable.title} ~ Evolution plot"
+
+    if subset_data.empty: return plt.title(title)
 
     # Create a plot
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -345,7 +364,7 @@ def generate_evo_plot(field_name: str, publication_year: pd.Series, data: pd.Dat
     sns.lineplot(data=subset_data, x='Year', y='Frequency', hue=hue, style='Value', markers=True)
 
     # Setting title, labels, and theme
-    plt.title(f"{variable.title} ~ Evolution plot")
+    plt.title(title)
     plt.xlabel('Year')
     plt.ylabel('Frequency')
     plt.grid(True)
@@ -420,7 +439,9 @@ def generate_comp_stacked_bar_plot(field_name: str, dependency_field_name: str, 
     subset_data = beautify_data_comp(field_name, dependency_field_name,
                                       variable, dependency_variable, data)
 
-    if subset_data.empty: return
+    title = f"{variable.title} and {dependency_variable.title} ~ Stacked bar plot"
+
+    if subset_data.empty: return plt.title(title)
 
     # Pivot the data to get a matrix form
     pivoted_data = subset_data.pivot(index=field_name, columns=dependency_field_name, values='Frequency')
@@ -437,7 +458,7 @@ def generate_comp_stacked_bar_plot(field_name: str, dependency_field_name: str, 
         plt.bar(pivoted_data.index, pivoted_data[col], bottom=bottom_value, label=col)
         bottom_value += pivoted_data[col]
 
-    plt.title(f"{variable.title} and {dependency_variable.title} ~ Stacked bar plot")
+    plt.title(title)
     plt.xlabel(variable.title)
     plt.ylabel('Frequency')
     configureSeabornLegend(dependency_variable.title, ax, plt)
@@ -455,13 +476,15 @@ def generate_comp_grouped_bar_plot(field_name: str, dependency_field_name: str, 
 
     subset_data = beautify_data_comp(field_name, dependency_field_name,
                                       variable, dependency_variable, data)
+    
+    title = f"{variable.title} and {dependency_variable.title} ~ Grouped bar plot"
 
-    if subset_data.empty: return
+    if subset_data.empty: return plt.title(title)
 
     fig, ax = plt.subplots(figsize=(10, 6))
     sns.barplot(x=field_name, y='Frequency', hue=dependency_field_name, data=subset_data, dodge=False) # type: ignore
 
-    plt.title(f"{variable.title} and {dependency_variable.title} ~ Grouped bar plot")
+    plt.title(title)
     plt.gca().set_xlabel('')
     plt.ylabel('Frequency')
     configureSeabornLegend(dependency_variable.title, ax, plt)
@@ -480,7 +503,9 @@ def generate_comp_bubble_chart(field_name: str, dependency_field_name: str, data
     subset_data = beautify_data_comp(field_name, dependency_field_name,
                                       variable, dependency_variable, data)
 
-    if subset_data.empty: return
+    title = f"{variable.title} and {dependency_variable.title} ~ Bubble Chart"
+
+    if subset_data.empty: return plt.title(title)
 
     # Creating the bubble chart
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -488,7 +513,7 @@ def generate_comp_bubble_chart(field_name: str, dependency_field_name: str, data
     sns.scatterplot(data=subset_data, x=field_name, y=dependency_field_name, size=size, color='black')
 
     # Adding labels and title
-    plt.title(f"{variable.title} and {dependency_variable.title} ~ Bubble Chart")
+    plt.title(title)
     plt.gca().set_xlabel('')
     plt.gca().set_ylabel('')
     configureSeabornLegend(size, ax, plt)
