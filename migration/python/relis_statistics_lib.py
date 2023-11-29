@@ -31,10 +31,10 @@ class FieldClassificationType(Enum):
     CONTINUOUS = 'Continuous'
 
 class Variable:
-    def __init__(self, name: str, title: str, type: FieldClassificationType, multiple: bool):
+    def __init__(self, name: str, title: str, dataType: FieldClassificationType, multiple: bool):
         self.name = name
         self.title = title
-        self.type = type
+        self.dataType = dataType
         self.multiple = multiple
 
 class NominalVariables(Enum):
