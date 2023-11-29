@@ -1,4 +1,4 @@
-# relis-statistical-templates
+# relis-statistical-classification-environment
 
 ## 🔍 Overview
 
