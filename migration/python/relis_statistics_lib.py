@@ -177,9 +177,14 @@ def beautify_data_desc(field_name: str, data: pd.DataFrame):
 ## Frequency tables
 
 def generate_desc_frequency_table(field_name: str, data: pd.DataFrame):
+    
+    df_title = dataFrameGetTitle('Descriptive', 'Frequency tables', field_name)
+    
+    if data.empty: return create_empty_dataframe(df_title, dataFrameUpdateTitle)
+
     subset_data = beautify_data_desc(field_name, data)
 
-    dataFrameUpdateTitle(subset_data, dataFrameGetTitle('Descriptive', 'Frequency tables', field_name))
+    dataFrameUpdateTitle(subset_data, df_title)
 
     return subset_data
 
@@ -189,15 +194,15 @@ desc_frequency_tables = {NominalVariables[field_name]:  generate_desc_frequency_
 ## Bar plots
 
 def generate_desc_bar_plot(field_name: str, data: pd.DataFrame):
-    df = beautify_data_desc(field_name, data)
-
     # Get metadata
     variable = get_variable(field_name, NominalVariables)
 
     # Set labels and title
     title = f"{variable.title} ~ Bar plot"
     
-    if df.empty: return plt.title(title)
+    if data.empty: return plt.title(title)
+
+    df = beautify_data_desc(field_name, data)
 
     # Create the plot
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -218,12 +223,12 @@ desc_bar_plots = {NominalVariables[field_name]: generate_desc_bar_plot(field_nam
 
 def generate_desc_statistics(field_name: str, data: pd.DataFrame):
     series =  data[field_name]
-    
-    series.replace('', np.nan, inplace=True)
 
     df_title = dataFrameGetTitle('Descriptive', 'Statistics', field_name)
     
-    if data.empty: return create_empty_dataframe(df_title, dataFrameUpdateTitle)
+    if series.empty: return create_empty_dataframe(df_title, dataFrameUpdateTitle)
+    
+    series.replace('', np.nan, inplace=True)
 
     nan_policy = 'omit' if Policies.DROP_NA.value else 'propagate'
     results = {
