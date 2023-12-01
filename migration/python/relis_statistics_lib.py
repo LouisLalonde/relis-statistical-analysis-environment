@@ -565,6 +565,13 @@ comp_chi_squared_tests = {NominalVariables[field_name]: evaluate_comparative_dep
 def generate_comp_shapiro_wilk_test(field_name: str, continuous_df: pd.DataFrame):
     subset_data = continuous_df[field_name].fillna(0)
 
+    df_title = dataFrameGetTitle('Comparative', "Shapiro Wilk's Correlation Test", field_name)
+
+    empty_df = create_empty_dataframe(df_title, dataFrameUpdateTitle)
+
+    # Test requires at least 3 samples
+    if len(subset_data) <= 2: return empty_df
+
     shapiro_result = shapiro(subset_data)
 
     statistics, pvalue =  shapiro_result
@@ -574,7 +581,7 @@ def generate_comp_shapiro_wilk_test(field_name: str, continuous_df: pd.DataFrame
         'p-value': pvalue
     }, index=[0])
 
-    dataFrameUpdateTitle(subset_data, dataFrameGetTitle('Comparative', "Shapiro Wilk's Correlation Test", field_name))
+    dataFrameUpdateTitle(subset_data, df_title)
 
     return subset_data
 
@@ -584,12 +591,17 @@ comp_shapiro_wilk_tests = {ContinuousVariables[field_name]: generate_comp_shapir
 ## Pearson's Correlation Test
 
 def generate_comp_pearson_cor_test(field_name: str, dependency_field_name: str, data: pd.DataFrame):
+    df_title = dataFrameGetTitle('Comparative', "Pearson's Correlation Test", field_name)
+
+    empty_df = create_empty_dataframe(df_title, dataFrameUpdateTitle)
+    
+    if comp_shapiro_wilk_tests[ContinuousVariables[field_name]].empty or \
+    comp_shapiro_wilk_tests[ContinuousVariables[dependency_field_name]].empty : return empty_df
+
     p_value = comp_shapiro_wilk_tests[ContinuousVariables[field_name]]['p-value'][0]
     dp_value = comp_shapiro_wilk_tests[ContinuousVariables[dependency_field_name]]['p-value'][0]
 
-    df_title = dataFrameGetTitle('Comparative', "Pearson's Correlation Test", field_name)
-
-    if not (p_value > 0.05 and dp_value > 0.05): return create_empty_dataframe(df_title, dataFrameUpdateTitle)
+    if not (p_value > 0.05 and dp_value > 0.05): return empty_df
     
     # Perform Pearson's correlation test
     pearson_coefficient, p_value = pearsonr(data[field_name].fillna(0), data[dependency_field_name].fillna(0))
@@ -609,12 +621,17 @@ comp_pearson_cor_tests = {ContinuousVariables[field_name]: evaluate_comparative_
 ## Spearman's Correlation Test
 
 def generate_comp_spearman_cor_test(field_name: str, dependency_field_name: str, data: pd.DataFrame):
+    df_title = dataFrameGetTitle('Comparative', "Spearman's Correlation Test", field_name)
+
+    empty_df = create_empty_dataframe(df_title, dataFrameUpdateTitle)
+
+    if comp_shapiro_wilk_tests[ContinuousVariables[field_name]].empty or \
+    comp_shapiro_wilk_tests[ContinuousVariables[dependency_field_name]].empty : return empty_df
+
     p_value = comp_shapiro_wilk_tests[ContinuousVariables[field_name]]['p-value'][0]
     dp_value = comp_shapiro_wilk_tests[ContinuousVariables[dependency_field_name]]['p-value'][0]
-
-    df_title = dataFrameGetTitle('Comparative', "Spearman's Correlation Test", field_name)
     
-    if  p_value > 0.05 and dp_value > 0.05: return create_empty_dataframe(df_title, dataFrameUpdateTitle)
+    if  p_value > 0.05 and dp_value > 0.05: return empty_df
 
     # Perform Spearman's correlation test
     spearman_result = spearmanr(data[field_name].fillna(0), data[dependency_field_name].fillna(0))
