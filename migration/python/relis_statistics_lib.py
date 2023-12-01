@@ -204,6 +204,8 @@ def generate_desc_bar_plot(field_name: str, data: pd.DataFrame):
 
     df = beautify_data_desc(field_name, data)
 
+    if df.empty: return plt.title(title) 
+
     # Create the plot
     fig, ax = plt.subplots(figsize=(10, 6))
     hue = 'n'
