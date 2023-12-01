@@ -125,12 +125,15 @@ def display_data(dataFrame: pd.DataFrame, bool: bool):
     print('\n')
 
 def display_figure(plt, bool: bool):
+    if not bool:
+        return
+    
     if isinstance(plt, Text):
         print(plt.get_text())
         print(no_data_message())
         print('\n')
         return
-    elif bool: plt.show()
+    else: plt.show()
 
 ### Data
 
