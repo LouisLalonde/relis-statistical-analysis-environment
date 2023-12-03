@@ -16,6 +16,8 @@ The `relis_statistics_kernel` executable artifact defines the analysis configura
 
 The `relis_statistics_playground` executable artifact is the entry point for experimenters to retreive the results of their project's statistical analysis. Every combination of statistic analysis is pre-evaluated based on the ReLiS project classification configuration.
 
+The `requirements.txt` contains the Python librairies which the environment depends on.
+
 **Primary authors:** Louis Lalonde [@louislalonde](https://github.com/LouisLalonde) and Hanz Schepens [@Wickkawizz](https://github.com/Wickkawizz)
 
 ## 🚀 Execution
