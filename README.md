@@ -2,7 +2,7 @@
 
 ## 🔍 Overview
 
-This repository defines the *Relis* statistical analysis environment executable artifacts for the Python GPL.
+This repository defines the *Relis* statistical analysis environment artifacts for the Python GPL.
 
 The environment artifacts are seamlessly created using the TWIG template engine's versatile templating system.
 
