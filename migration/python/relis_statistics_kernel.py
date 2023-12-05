@@ -67,7 +67,7 @@ class ContinuousDataFrame(DataFrame):
 
 ### Shared
 
-def substituteNan(df: pd.DataFrame) -> None:
+def substitute_nan(df: pd.DataFrame) -> None:
     df.replace(np.nan, '', inplace=True)
 
 def get_variable(field_name: str, variables) -> Variable:
@@ -150,8 +150,8 @@ nominal_data = project_classification_data[nominal_variables.keys()].rename(colu
 continuous_data = project_classification_data[continuous_variables.keys()].rename(columns=continuous_variables)
 
 if (not Policies.DROP_NA.value):
-    substituteNan(nominal_data)
-    substituteNan(continuous_data)
+    substitute_nan(nominal_data)
+    substitute_nan(continuous_data)
 
 nominal = NominalDataFrame(nominal_data, NominalVariables)
 continuous = ContinuousDataFrame(continuous_data, ContinuousVariables)
