@@ -67,7 +67,7 @@ class ContinuousDataFrame(DataFrame):
 
 ### Shared
 
-def __substitute_nan(df: pd.DataFrame) -> None:
+def __substitute_nan(df: pd.DataFrame):
     df.replace(np.nan, '', inplace=True)
 
 def __get_variable(field_name: str, variables) -> Variable:
@@ -109,10 +109,18 @@ def __create_empty_dataframe(title: dict[str, str], __dataframe_update_title):
 
     return empty_df
 
+def __validate_comp_shapiro_wilk_test(variable_result: pd.DataFrame,
+                              comparison_variable_result: pd.DataFrame):
+    if variable_result.empty or comparison_variable_result.empty:
+        return
+
+    return True
+
+
 def __no_data_message():
     return 'No data... Nothing to show'
 
-def __display_data(dataFrame: pd.DataFrame, bool: bool):
+def __display_data(dataFrame: pd.DataFrame):
     if not bool:
         return
     
@@ -124,7 +132,7 @@ def __display_data(dataFrame: pd.DataFrame, bool: bool):
         print(__no_data_message())
     print('\n')
 
-def __display_figure(plt, bool: bool):
+def __display_figure(plt):
     if not bool:
         return
     
@@ -153,14 +161,14 @@ if (not Policies.DROP_NA.value):
     __substitute_nan(nominal_data)
     __substitute_nan(continuous_data)
 
-nominal = NominalDataFrame(nominal_data, NominalVariables)
-continuous = ContinuousDataFrame(continuous_data, ContinuousVariables)
+nominal_dataframe = NominalDataFrame(nominal_data, NominalVariables)
+continuous_dataframe = ContinuousDataFrame(continuous_data, ContinuousVariables)
 
 ### DESCRIPTIVE STATS
 
 ## Util
 
-def beautify_data_desc(field_name: str, data: pd.DataFrame):
+def __beautify_data_desc(field_name: str, data: pd.DataFrame):
     # Get metadata
     variable = __get_variable(field_name, NominalVariables)
 
@@ -179,8 +187,8 @@ def beautify_data_desc(field_name: str, data: pd.DataFrame):
 
 ## Frequency tables
 
-def desc_frequency_table(classification_variable: NominalVariables, show: bool):
-    df = nominal.data
+def __desc_frequency_table(classification_variable: NominalVariables):
+    df = nominal_dataframe.data
 
     variable = classification_variable.value
     
@@ -188,18 +196,22 @@ def desc_frequency_table(classification_variable: NominalVariables, show: bool):
     
     if df.empty: return __create_empty_dataframe(df_title, __dataframe_update_title)
 
-    subset_data = beautify_data_desc(variable.name, df)
+    subset_data = __beautify_data_desc(variable.name, df)
 
     __dataframe_update_title(subset_data, df_title)
 
-    __display_data(subset_data, show)
-
     return subset_data
+
+def desc_frequency_table(classification_variable: NominalVariables, show: bool):
+    if not show: return
+    
+    data = __desc_frequency_table(classification_variable)
+    __display_data(data)
 
 ## Bar plots
 
-def desc_bar_plot(classification_variable: NominalVariables, show: bool):
-    df = nominal.data
+def __desc_bar_plot(classification_variable: NominalVariables):
+    df = nominal_dataframe.data
 
     variable = classification_variable.value
 
@@ -208,7 +220,7 @@ def desc_bar_plot(classification_variable: NominalVariables, show: bool):
     
     if df.empty: return plt.title(title)
 
-    df = beautify_data_desc(variable.name, df)
+    df = __beautify_data_desc(variable.name, df)
 
     if df.empty: return plt.title(title) 
 
@@ -222,14 +234,18 @@ def desc_bar_plot(classification_variable: NominalVariables, show: bool):
     plt.ylabel('Percentage')
     __configure_seaborn_legend(hue, ax, plt)
 
-    __display_figure(fig, show)
-
     return fig
+
+def desc_bar_plot(classification_variable: NominalVariables, show: bool):
+    if not show: return
+    
+    data = __desc_bar_plot(classification_variable)
+    __display_figure(data)
 
 ## Statistics
 
-def desc_statistics(classification_variable: ContinuousVariables, show: bool):
-    df = continuous.data
+def __desc_statistics(classification_variable: ContinuousVariables):
+    df = continuous_dataframe.data
 
     variable = classification_variable.value
 
@@ -262,14 +278,18 @@ def desc_statistics(classification_variable: ContinuousVariables, show: bool):
 
     __dataframe_update_title(subset_data, df_title)
 
-    __display_data(subset_data, show)
-
     return subset_data
+
+def desc_statistics(classification_variable: ContinuousVariables, show: bool):
+    if not show: return
+    
+    data = __desc_statistics(classification_variable)
+    __display_data(data)
 
 ## Box Plots
 
-def desc_box_plot(classification_variable: ContinuousVariables, show: bool):
-    df = continuous.data
+def __desc_box_plot(classification_variable: ContinuousVariables):
+    df = continuous_dataframe.data
 
     variable = classification_variable.value
 
@@ -293,14 +313,18 @@ def desc_box_plot(classification_variable: ContinuousVariables, show: bool):
     plt.xlabel('')
     plt.gca().yaxis.set_major_formatter(ticker.FormatStrFormatter('%0.0f'))
 
-    __display_figure(fig, show)
-
     return fig
+
+def desc_box_plot(classification_variable: ContinuousVariables, show: bool):
+    if not show: return
+    
+    data = __desc_box_plot(classification_variable)
+    __display_figure(data)
 
 ## Violin Plots
 
-def desc_violin_plot(classification_variable: ContinuousVariables, show: bool):
-    df = continuous.data
+def __desc_violin_plot(classification_variable: ContinuousVariables):
+    df = continuous_dataframe.data
 
     variable = classification_variable.value
 
@@ -318,9 +342,13 @@ def desc_violin_plot(classification_variable: ContinuousVariables, show: bool):
     plt.xlabel('Density')
     plt.xticks([])
 
-    __display_figure(fig, show)
-
     return fig
+
+def desc_violin_plot(classification_variable: ContinuousVariables, show: bool):
+    if not show: return
+    
+    data = __desc_violin_plot(classification_variable)
+    __display_figure(data)
 
 ### EVOLUTIVE STATS
 
@@ -346,33 +374,37 @@ def __beautify_data_evo(field_name: str, publication_year: pd.Series, variable: 
 
 ## Frequency tables
 
-def evo_frequency_table(classification_variable: NominalVariables, show: bool):
-    df = nominal.data
+def __evo_frequency_table(classification_variable: NominalVariables):
+    df = nominal_dataframe.data
 
-    publication_year = df["publication_year"]
+    publication_year = continuous_dataframe.data["publication_year"]
 
     variable = classification_variable.value
 
     subset_data = __beautify_data_evo(variable.name, publication_year, variable, df)
 
     # Pivoting the data
-    subset_data = subset_data.pivot(index='Year', columns='Value', values='Frequency').fillna(0)
+    subset_data = subset_data.pivot(index='Year', columns='Value', values='Frequency').replace('', np.nan).fillna(0)
 
     subset_data.columns.name = None
     subset_data.reset_index(inplace=True)
 
     __dataframe_update_title(subset_data, __dataframe_get_title('Evolutive', 'Frequency tables', variable.title))
 
-    __display_data(subset_data, show)
-
     return subset_data 
+
+def evo_frequency_table(classification_variable: NominalVariables, show: bool):
+    if not show: return
+    
+    data = __evo_frequency_table(classification_variable)
+    __display_data(data)
 
 ## Evolution Plots
 
-def evo_plot(classification_variable: NominalVariables, show: bool):
-    df = nominal.data
+def __evo_plot(classification_variable: NominalVariables):
+    df = nominal_dataframe.data
 
-    publication_year = df["publication_year"]
+    publication_year = continuous_dataframe.data["publication_year"]
 
     variable = classification_variable.value
     
@@ -394,9 +426,13 @@ def evo_plot(classification_variable: NominalVariables, show: bool):
     plt.grid(True)
     __configure_seaborn_legend(hue, ax, plt)
 
-    __display_figure(fig, show)
-
     return fig
+
+def evo_plot(classification_variable: NominalVariables, show: bool):
+    if not show: return
+    
+    data = __evo_plot(classification_variable)
+    __display_figure(data)
 
 ### COMPARATIVE STATS
 
@@ -427,9 +463,9 @@ def __beautify_data_comp(field_name: str, comparison_variable_name: str,
 
 ## Frequency Tables
 
-def comp_frequency_table(classification_variable: NominalVariables,
-                              comparison_classification_variable: NominalVariables, show: bool):
-    data = nominal.data
+def __comp_frequency_table(classification_variable: NominalVariables,
+                              comparison_classification_variable: NominalVariables):
+    data = nominal_dataframe.data
 
     variable = classification_variable.value
     comparison_variable = comparison_classification_variable.value
@@ -440,15 +476,20 @@ def comp_frequency_table(classification_variable: NominalVariables,
     __dataframe_update_title(subset_data, __dataframe_get_title('Comparative', 'Frequency tables',
                                                                  variable.title, comparison_variable.title))
 
-    __display_data(subset_data, show)
-
     return subset_data
+
+def comp_frequency_table(classification_variable: NominalVariables,
+                              comparison_classification_variable: NominalVariables, show: bool):
+    if not show: return
+    
+    data = __comp_frequency_table(classification_variable, comparison_classification_variable)
+    __display_data(data)
 
 ## Stacked Bar Plots
 
-def comp_stacked_bar_plot(classification_variable: NominalVariables,
-                              comparison_classification_variable: NominalVariables, show: bool):
-    data = nominal.data
+def __comp_stacked_bar_plot(classification_variable: NominalVariables,
+                              comparison_classification_variable: NominalVariables):
+    data = nominal_dataframe.data
 
     variable = classification_variable.value
     comparison_variable = comparison_classification_variable.value
@@ -464,7 +505,7 @@ def comp_stacked_bar_plot(classification_variable: NominalVariables,
     pivoted_data = subset_data.pivot(index=variable.name, columns=comparison_variable.name, values='Frequency')
 
     # Replace NaN values with 0
-    pivoted_data = pivoted_data.fillna(0)
+    pivoted_data = pivoted_data.replace('', np.nan).fillna(0)
 
     fig, ax = plt.subplots(figsize=(10, 6))
 
@@ -480,15 +521,20 @@ def comp_stacked_bar_plot(classification_variable: NominalVariables,
     plt.ylabel('Frequency')
     __configure_seaborn_legend(comparison_variable.title, ax, plt)
 
-    __display_figure(fig, show)
-
     return fig
+
+def comp_stacked_bar_plot(classification_variable: NominalVariables,
+                              comparison_classification_variable: NominalVariables, show: bool):
+    if not show: return
+    
+    data = __comp_stacked_bar_plot(classification_variable, comparison_classification_variable)
+    __display_figure(data)
 
 ## Grouped Bar Plots
 
-def comp_grouped_bar_plot(classification_variable: NominalVariables,
-                              comparison_classification_variable: NominalVariables, show: bool):
-    data = nominal.data
+def __comp_grouped_bar_plot(classification_variable: NominalVariables,
+                              comparison_classification_variable: NominalVariables):
+    data = nominal_dataframe.data
 
     variable = classification_variable.value
     comparison_variable = comparison_classification_variable.value
@@ -508,15 +554,20 @@ def comp_grouped_bar_plot(classification_variable: NominalVariables,
     plt.ylabel('Frequency')
     __configure_seaborn_legend(comparison_variable.title, ax, plt)
 
-    __display_figure(fig, show)
-
     return fig
+
+def comp_grouped_bar_plot(classification_variable: NominalVariables,
+                              comparison_classification_variable: NominalVariables, show: bool):
+    if not show: return
+    
+    data = __comp_grouped_bar_plot(classification_variable, comparison_classification_variable)
+    __display_figure(data)
 
 ## Bubble Charts
 
-def comp_bubble_chart(classification_variable: NominalVariables,
-                              comparison_classification_variable: NominalVariables, show: bool):
-    data = nominal.data
+def __comp_bubble_chart(classification_variable: NominalVariables,
+                              comparison_classification_variable: NominalVariables):
+    data = nominal_dataframe.data
 
     variable = classification_variable.value
     comparison_variable = comparison_classification_variable.value
@@ -539,15 +590,20 @@ def comp_bubble_chart(classification_variable: NominalVariables,
     plt.gca().set_ylabel('')
     __configure_seaborn_legend(size, ax, plt)
 
-    __display_figure(fig, show)
-
     return fig
+
+def comp_bubble_chart(classification_variable: NominalVariables,
+                              comparison_classification_variable: NominalVariables, show: bool):
+    if not show: return
+    
+    data = __comp_bubble_chart(classification_variable, comparison_classification_variable)
+    __display_figure(data)
 
 ## Chi-squared test
 
-def comp_chi_squared_test(classification_variable: NominalVariables,
-                              comparison_classification_variable: NominalVariables, show: bool):
-    data = nominal.data
+def __comp_chi_squared_test(classification_variable: NominalVariables,
+                              comparison_classification_variable: NominalVariables):
+    data = nominal_dataframe.data
 
     variable = classification_variable.value
     comparison_variable = comparison_classification_variable.value
@@ -569,7 +625,7 @@ def comp_chi_squared_test(classification_variable: NominalVariables,
 
     # Create contingency table
     contingency_table = pd.crosstab(subset_data[variable.name], subset_data[comparison_variable.name],
-                                     values=subset_data['Frequency'], aggfunc='sum', dropna=False).fillna(0)
+                                     values=subset_data['Frequency'], aggfunc='sum', dropna=False).replace('', np.nan).fillna(0)
    
     # Calculating the Chi-squared statistic
     chi2_result = chi2_contingency(contingency_table)
@@ -580,22 +636,27 @@ def comp_chi_squared_test(classification_variable: NominalVariables,
 
     __dataframe_update_title(subset_data, df_title)
 
-    __display_data(subset_data, show)
-
     return subset_data
+
+def comp_chi_squared_test(classification_variable: NominalVariables,
+                              comparison_classification_variable: NominalVariables, show: bool):
+    if not show: return
+    
+    data = __comp_chi_squared_test(classification_variable, comparison_classification_variable)
+    __display_data(data)
 
 ## Shapiro Wilk's Correlation Test
 
-def comp_shapiro_wilk_test(classification_variable: ContinuousVariables, show: bool):
-    df = continuous.data
+def __comp_shapiro_wilk_test(classification_variable: ContinuousVariables):
+    df = continuous_dataframe.data
 
     variable = classification_variable.value
 
-    subset_data = df[variable.name].fillna(0)
+    subset_data = df[variable.name].replace('', np.nan).replace('', np.nan).fillna(0)
 
     df_title = __dataframe_get_title('Comparative', "Shapiro Wilk's Correlation Test",
                                     variable.title)
-
+    
     empty_df = __create_empty_dataframe(df_title, __dataframe_update_title)
 
     # Test requires at least 3 samples
@@ -612,15 +673,19 @@ def comp_shapiro_wilk_test(classification_variable: ContinuousVariables, show: b
 
     __dataframe_update_title(subset_data, df_title)
 
-    __display_data(subset_data, show)
-
     return subset_data
+
+def comp_shapiro_wilk_test(classification_variable: ContinuousVariables, show: bool):
+    if not show: return
+    
+    data = __comp_shapiro_wilk_test(classification_variable)
+    __display_data(data)
 
 ## Pearson's Correlation Test
 
-def comp_pearson_cor_test(classification_variable: ContinuousVariables,
-                              comparison_classification_variable: ContinuousVariables, show: bool):
-    data = continuous.data
+def __comp_pearson_cor_test(classification_variable: ContinuousVariables,
+                              comparison_classification_variable: ContinuousVariables):
+    data = continuous_dataframe.data
 
     variable = classification_variable.value
     comparison_variable = comparison_classification_variable.value
@@ -630,19 +695,21 @@ def comp_pearson_cor_test(classification_variable: ContinuousVariables,
 
     empty_df = __create_empty_dataframe(df_title, __dataframe_update_title)
 
-    cv_comp_shapiro_wilk_tests = comp_shapiro_wilk_test(classification_variable, False)
-    ccv_comp_shapiro_wilk_tests = comp_shapiro_wilk_test(comparison_classification_variable, False)
+    cv_comp_shapiro_wilk_test = __comp_shapiro_wilk_test(classification_variable)
+    ccv_comp_shapiro_wilk_test = __comp_shapiro_wilk_test(comparison_classification_variable)
     
-    if comp_shapiro_wilk_test(classification_variable, False).empty or \
-    comp_shapiro_wilk_test(comparison_classification_variable, False).empty : return empty_df
+    if cv_comp_shapiro_wilk_test is None or ccv_comp_shapiro_wilk_test is None \
+        or not __validate_comp_shapiro_wilk_test(cv_comp_shapiro_wilk_test, ccv_comp_shapiro_wilk_test):
+        return empty_df
 
-    p_value = cv_comp_shapiro_wilk_tests['p-value'][0]
-    dp_value = ccv_comp_shapiro_wilk_tests['p-value'][0]
+    p_value = cv_comp_shapiro_wilk_test['p-value'][0]
+    dp_value = ccv_comp_shapiro_wilk_test['p-value'][0]
 
     if not (p_value > 0.05 and dp_value > 0.05): return empty_df
     
     # Perform Pearson's correlation test
-    pearson_coefficient, p_value = pearsonr(data[variable.name].fillna(0), data[comparison_variable.name].fillna(0))
+    pearson_coefficient, p_value = pearsonr(data[variable.name].replace('', np.nan).fillna(0),
+                                             data[comparison_variable.name].replace('', np.nan).fillna(0))
 
     subset_data = pd.DataFrame({
         'pearson coefficient': pearson_coefficient,
@@ -651,15 +718,20 @@ def comp_pearson_cor_test(classification_variable: ContinuousVariables,
 
     __dataframe_update_title(subset_data, df_title)
 
-    __display_data(subset_data, show)
-
     return subset_data
+
+def comp_pearson_cor_test(classification_variable: ContinuousVariables,
+                              comparison_classification_variable: ContinuousVariables, show: bool):
+    if not show: return
+    
+    data = __comp_pearson_cor_test(classification_variable, comparison_classification_variable)
+    __display_data(data)
 
 ## Spearman's Correlation Test
 
-def comp_spearman_cor_test(classification_variable: ContinuousVariables,
-                              comparison_classification_variable: ContinuousVariables, show: bool):
-    data = continuous.data
+def __comp_spearman_cor_test(classification_variable: ContinuousVariables,
+                              comparison_classification_variable: ContinuousVariables):
+    data = continuous_dataframe.data
 
     variable = classification_variable.value
     comparison_variable = comparison_classification_variable.value
@@ -669,19 +741,21 @@ def comp_spearman_cor_test(classification_variable: ContinuousVariables,
 
     empty_df = __create_empty_dataframe(df_title, __dataframe_update_title)
 
-    cv_comp_shapiro_wilk_tests = comp_shapiro_wilk_test(classification_variable, False)
-    ccv_comp_shapiro_wilk_tests = comp_shapiro_wilk_test(comparison_classification_variable, False)
-    
-    if comp_shapiro_wilk_test(classification_variable, False).empty or \
-    comp_shapiro_wilk_test(comparison_classification_variable, False).empty : return empty_df
+    cv_comp_shapiro_wilk_test = __comp_shapiro_wilk_test(classification_variable)
+    ccv_comp_shapiro_wilk_test = __comp_shapiro_wilk_test(comparison_classification_variable)
 
-    p_value = cv_comp_shapiro_wilk_tests['p-value'][0]
-    dp_value = ccv_comp_shapiro_wilk_tests['p-value'][0]
+    if cv_comp_shapiro_wilk_test is None or ccv_comp_shapiro_wilk_test is None \
+        or not __validate_comp_shapiro_wilk_test(cv_comp_shapiro_wilk_test, ccv_comp_shapiro_wilk_test):
+        return empty_df
+    
+    p_value = cv_comp_shapiro_wilk_test['p-value'][0]
+    dp_value = ccv_comp_shapiro_wilk_test['p-value'][0]
     
     if  p_value > 0.05 and dp_value > 0.05: return empty_df
 
     # Perform Spearman's correlation test
-    spearman_result = spearmanr(data[variable.name].fillna(0), data[comparison_variable.name].fillna(0))
+    spearman_result = spearmanr(data[variable.name].replace('', np.nan).fillna(0),
+                                 data[comparison_variable.name].replace('', np.nan).fillna(0))
 
     subset_data = pd.DataFrame({
         'statistic': spearman_result.statistic, # type: ignore
@@ -690,6 +764,11 @@ def comp_spearman_cor_test(classification_variable: ContinuousVariables,
 
     __dataframe_update_title(subset_data, df_title)
 
-    __display_data(subset_data, show)
-   
     return subset_data
+
+def comp_spearman_cor_test(classification_variable: ContinuousVariables,
+                              comparison_classification_variable: ContinuousVariables, show: bool):
+    if not show: return
+
+    data = __comp_spearman_cor_test(classification_variable, comparison_classification_variable)
+    __display_data(data)
