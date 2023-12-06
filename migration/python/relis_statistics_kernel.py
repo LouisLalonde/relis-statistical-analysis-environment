@@ -26,31 +26,31 @@ class Policies(Enum):
 
 ### Types
 
-class VariableClassificationType(Enum):
+class VariableDataType(Enum):
     NOMINAL = 'Nominal'
     CONTINUOUS = 'Continuous'
 
 class Variable:
-    def __init__(self, name: str, title: str, data_type: VariableClassificationType, multiple: bool):
+    def __init__(self, name: str, title: str, data_type: VariableDataType, multiple: bool):
         self.name = name
         self.title = title
         self.data_type = data_type
         self.multiple = multiple
 
 class NominalVariables(Enum):
-    venue = Variable('venue', 'Venue', VariableClassificationType.NOMINAL, False)
-    search_type = Variable('search_type', 'Search Type', VariableClassificationType.NOMINAL, False)
-    domain = Variable('domain', 'Domain', VariableClassificationType.NOMINAL, False)
-    transformation_language = Variable('transformation_language', 'Transformation Language', VariableClassificationType.NOMINAL, True)
-    source_language = Variable('source_language', 'Source language', VariableClassificationType.NOMINAL, False)
-    target_language = Variable('target_language', 'Target language', VariableClassificationType.NOMINAL, False)
-    scope = Variable('scope', 'Scope', VariableClassificationType.NOMINAL, True)
-    industrial = Variable('industrial', 'Industrial', VariableClassificationType.NOMINAL, False)
-    bidirectional = Variable('bidirectional', 'Bidirectional', VariableClassificationType.NOMINAL, False)
+    venue = Variable('venue', 'Venue', VariableDataType.NOMINAL, False)
+    search_type = Variable('search_type', 'Search Type', VariableDataType.NOMINAL, False)
+    domain = Variable('domain', 'Domain', VariableDataType.NOMINAL, False)
+    transformation_language = Variable('transformation_language', 'Transformation Language', VariableDataType.NOMINAL, True)
+    source_language = Variable('source_language', 'Source language', VariableDataType.NOMINAL, False)
+    target_language = Variable('target_language', 'Target language', VariableDataType.NOMINAL, False)
+    scope = Variable('scope', 'Scope', VariableDataType.NOMINAL, True)
+    industrial = Variable('industrial', 'Industrial', VariableDataType.NOMINAL, False)
+    bidirectional = Variable('bidirectional', 'Bidirectional', VariableDataType.NOMINAL, False)
 
 class ContinuousVariables(Enum):
-    publication_year = Variable('publication_year', 'Publication year', VariableClassificationType.CONTINUOUS, False)
-    targeted_year = Variable('targeted_year', 'Targeted year', VariableClassificationType.CONTINUOUS, False)
+    publication_year = Variable('publication_year', 'Publication year', VariableDataType.CONTINUOUS, False)
+    targeted_year = Variable('targeted_year', 'Targeted year', VariableDataType.CONTINUOUS, False)
 
 class DataFrame:
     def __init__(self, data: pd.DataFrame, variable_type: Type[NominalVariables] | Type[ContinuousVariables]):
