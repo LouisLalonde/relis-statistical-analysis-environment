@@ -1,18 +1,12 @@
-import re
 import os
 import numpy as np
 import pandas as pd
 import pytest
-import seaborn as sns
-import matplotlib.pyplot as plt
-from enum import Enum
-from typing import Type
-from matplotlib import ticker
-from matplotlib.text import Text
-from statsmodels.robust.scale import mad
-from scipy.stats import kurtosis, skew, shapiro, spearmanr, pearsonr, chi2_contingency
 from python.relis_statistics_kernel import (
-    NominalVariables, ContinuousVariables, _aggregate_variables_by_data_type
+    NominalVariables, ContinuousVariables, Policies,
+    NominalDataFrame, ContinuousDataFrame,
+    _aggregate_variables_by_data_type, _transform_classification_data,
+    _substitute_nan
 )
 
 ### Testing
@@ -40,11 +34,17 @@ def project_classification_data():
 
 @pytest.fixture
 def project_classification_nominal_data():
-    return pd.read_csv(f'{TEST_ROOT_DIRECTORY}/data/project_classification_nominal_data.csv', encoding='utf8')
+    df = pd.read_csv(f'{TEST_ROOT_DIRECTORY}/data/project_classification_nominal_data.csv', encoding='utf8')
+    if not Policies.DROP_NA.value:
+        df.replace(np.nan, '', inplace=True)
+    return df
 
 @pytest.fixture
 def project_classification_continuous_data():
-    return pd.read_csv(f'{TEST_ROOT_DIRECTORY}/data/project_classification_continuous_data.csv', encoding='utf8')
+    df = pd.read_csv(f'{TEST_ROOT_DIRECTORY}/data/project_classification_continuous_data.csv', encoding='utf8')
+    if not Policies.DROP_NA.value:
+        df.replace(np.nan, '', inplace=True)
+    return df
 
 @pytest.fixture
 def nominal_variables():
@@ -61,6 +61,18 @@ def aggregated_nominal_variables():
 @pytest.fixture
 def aggregated_continuous_variables():
     return AGGREGATED_CONTINUOUS_VARIABLES
+
+@pytest.fixture
+def nominal_dataframe(project_classification_data):
+    aggregated_variables = _aggregate_variables_by_data_type(NominalVariables)
+    nominal_data = _transform_classification_data(project_classification_data, aggregated_variables)
+    return NominalDataFrame(nominal_data, NominalVariables)
+
+@pytest.fixture
+def continuous_dataframe(project_classification_data):
+    aggregated_variables = _aggregate_variables_by_data_type(ContinuousVariables)
+    continuous_data = _transform_classification_data(project_classification_data, aggregated_variables)
+    return ContinuousDataFrame(continuous_data, ContinuousVariables)
 
 ### Data
 
@@ -84,28 +96,22 @@ def test_aggregate_continuous_variables(continuous_variables, aggregated_continu
 
 ## Preprocessing
 
-def create_test_processing_classification_data(project_classification_data: pd.DataFrame, aggregated_variables: dict[str, str]):
-    return project_classification_data[aggregated_variables.keys()].rename(columns=aggregated_variables)
-
 def test_processing_classification_nominal_data(project_classification_data, aggregated_nominal_variables,
                                          project_classification_nominal_data):
-    data = create_test_processing_classification_data(project_classification_data, aggregated_nominal_variables)
+    data = _transform_classification_data(project_classification_data, aggregated_nominal_variables)
     assert project_classification_nominal_data.equals(data)
 
 
 def test_processing_classification_continuous_data(project_classification_data, aggregated_continuous_variables,
                                          project_classification_continuous_data):
-    data = create_test_processing_classification_data(project_classification_data, aggregated_continuous_variables)
+    data = _transform_classification_data(project_classification_data, aggregated_continuous_variables)
     assert project_classification_continuous_data.equals(data)
     
-
-def substitute_nan(df: pd.DataFrame):
-    df.replace(np.nan, '', inplace=True)
 
 def create_test_substitute_nan(df: pd.DataFrame):
 
     # Apply the function
-    substitute_nan(df)
+    _substitute_nan(df)
 
     # Assert that there are no NaN values in the DataFrame
     assert not df.isnull().values.any(), "DataFrame still contains NaN values"
@@ -116,3 +122,12 @@ def test_substitute_nan_nominal_variables(project_classification_nominal_data):
 def test_substitute_nan_continuous_variables(project_classification_continuous_data):
     create_test_substitute_nan(project_classification_continuous_data)
 
+def test_nominal_dataframe(nominal_dataframe, nominal_variables):
+    assert nominal_dataframe.data.columns.size == len(nominal_variables)
+    for variable in nominal_variables:
+        assert variable.name in nominal_dataframe.data.columns
+
+def test_continuous_dataframe(continuous_dataframe, continuous_variables):
+    assert continuous_dataframe.data.columns.size == len(continuous_variables)
+    for variable in continuous_variables:
+        assert variable.name in continuous_dataframe.data.columns

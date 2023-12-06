@@ -155,7 +155,7 @@ def _aggregate_variables_by_data_type(variables: type[NominalVariables] | type[C
 def _transform_classification_data(project_classification_data: pd.DataFrame, aggregated_variables: dict[str, str]):
     data = project_classification_data[aggregated_variables.keys()].rename(columns=aggregated_variables)
 
-    if (not Policies.DROP_NA.value):
+    if not Policies.DROP_NA.value:
         _substitute_nan(data)
 
     return data

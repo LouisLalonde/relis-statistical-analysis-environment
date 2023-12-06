@@ -1,0 +1,5 @@
+[run]
+source =
+    python/
+omit =
+    python/relis_statistics_playground.py
