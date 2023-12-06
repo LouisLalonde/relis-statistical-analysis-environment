@@ -116,7 +116,6 @@ def __validate_comp_shapiro_wilk_test(variable_result: pd.DataFrame,
 
     return True
 
-
 def __no_data_message():
     return 'No data... Nothing to show'
 
