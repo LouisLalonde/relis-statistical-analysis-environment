@@ -11,12 +11,15 @@ Three artifacts are generated:
 1. relis_statistics_kernel.py
 2. relis_statistics_playground.py
 3. requirements.txt
+4. relis_classification_<project_name>.csv
 
-The `relis_statistics_kernel` executable artifact defines the analysis configuration, data types, utility functions and statistical functions which are used to perform the statistical analysis of a *ReLiS* project.  
+The `relis_statistics_kernel` executable artifact defines the analysis configuration, data types, utility functions and statistical functions which are used to perform the statistical analysis of the *ReLiS* project.  
 
-The `relis_statistics_playground` executable artifact is the entry point for experimenters to retreive the results of their project's statistical analysis. Every combination of statistic analysis is pre-evaluated based on the ReLiS project classification configuration.
+The `relis_statistics_playground` executable artifact is the entry point for experimenters to retreive the results of their project's statistical analysis. Every combination of statistic analysis is pre-evaluated based on the *ReLiS* project classification configuration.
 
-The `requirements.txt` contains the Python librairies which the environment depends on.
+The `requirements.txt` file contains the Python librairies which the environment depends on.
+
+The `relis_classification_<project_name>.csv` file contains the classification data of the *ReLiS* project in csv format.
 
 **Primary authors:** Louis Lalonde [@louislalonde](https://github.com/LouisLalonde) and Hanz Schepens [@Wickkawizz](https://github.com/Wickkawizz)
 
@@ -29,6 +32,14 @@ The `requirements.txt` contains the Python librairies which the environment depe
 5. Modulate the visibility of the different statistical analysis results by changing the attribrute `False` to `True`
 6. Save the file
 7. Execute the file : `python3 relis_statistics_playground.py`
+
+## 🧪 Testing
+The following command need to be run in the `migration` directory
+### Unit testing and coverage
+
+```
+python3 -m pytest -s tests
+```
 
 ## 📊 Results
 - Statistical analysis returning data in tabular format will be displayed in the console.

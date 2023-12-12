@@ -1,0 +1,9 @@
+venue,search_type,domain,transformation_language,source_language,target_language,scope,industrial,bidirectional
+,,Artificial Intelligence,ATL | Henshin,UML,Java,Exogenous | Outplace,Yes,Yes
+,,Collaborative system,Henshin,SySML,Java,Inplace,No,Yes
+,,Collaborative system,QVT,DSL,Java,Exogenous,No,Yes
+,,Compilation,ATL,DSL,DSL,Inplace,Yes,No
+,,Compilation,Henshin | MoTiF,SySML,Java,Outplace,Yes,Yes
+,,Artificial Intelligence,Henshin,Java,UML,Inplace,No,No
+,,Collaborative system,Henshin,Java,Java,Inplace,Yes,Yes
+,,,,,,,,
