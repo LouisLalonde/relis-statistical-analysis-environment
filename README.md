@@ -6,7 +6,7 @@ This repository defines the *Relis* statistical analysis environment artifacts f
 
 The environment artifacts are seamlessly created using the TWIG template engine's versatile templating system.
 
-Three artifacts are generated:
+The environment is comprises of these artifacts:
 
 1. relis_statistics_kernel.py
 2. relis_statistics_playground.py
