@@ -65,6 +65,15 @@ class ContinuousDataFrame(DataFrame):
     def __init__(self, data: pd.DataFrame, variable_type: Type[ContinuousVariables]):
         super().__init__(data, variable_type)
 
+class DataCache:
+    def __init__(self):
+        self.cache = {}
+
+    def load_csv(self, file_path: str, encoding: str):
+        if file_path not in self.cache:
+            self.cache[file_path] = pd.read_csv(file_path, encoding=encoding)
+        return self.cache[file_path]
+
 ### Shared
 
 def _substitute_nan(df: pd.DataFrame):
@@ -146,8 +155,10 @@ def _display_figure(plt):
 
 ## Parsing
 
+data_cache = DataCache()
+
 def _read_project_classification_data(path = '../data/relis_classification_CV.csv'):
-    return pd.read_csv(path, encoding='utf8')
+    return data_cache.load_csv(path, 'utf8')
 
 def _aggregate_variables_by_data_type(variables: type[NominalVariables] | type[ContinuousVariables]):
     return {variable.value.title: variable.name for variable in variables}
