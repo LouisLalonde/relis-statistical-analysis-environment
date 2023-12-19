@@ -1,139 +1,119 @@
 <?php
 class Reporting extends CI_Controller
 {
-    /**
-     * Functions which are used to perform the statistical
-     * analysis of a given project
-     */
-    private function python_statistical_functions()
-    {
-        return array(
-            $this->python_statistical_function_factory(
-                'desc_frequency_table',
-                'Frequency tables',
-                'descriptive',
-                'Nominal',
-                'Dataframe'
-            ),
-            $this->python_statistical_function_factory(
-                'desc_bar_plot',
-                'Bar plots',
-                'descriptive',
-                'Nominal',
-                'Figure'
-            ),
-            $this->python_statistical_function_factory(
-                'desc_statistics',
-                'Statistics',
-                'descriptive',
-                'Continuous',
-                'Dataframe'
-            ),
-            $this->python_statistical_function_factory(
-                'desc_box_plot',
-                'Box plots',
-                'descriptive',
-                'Continuous',
-                'Figure'
-            ),
-            $this->python_statistical_function_factory(
-                'desc_violin_plot',
-                'Violin plots',
-                'descriptive',
-                'Continuous',
-                'Figure'
-            ),
-            $this->python_statistical_function_factory(
-                'evo_frequency_table',
-                'Frequency tables',
-                'evolutive',
-                'Nominal',
-                'Dataframe'
-            ),
-            $this->python_statistical_function_factory(
-                'evo_plot',
-                'Evolution plots',
-                'evolutive',
-                'Nominal',
-                'Figure'
-            ),
-            $this->python_statistical_function_factory(
-                'comp_frequency_table',
-                'Frequency tables',
-                'comparative',
-                'Nominal',
-                'Dataframe'
-            ),
-            $this->python_statistical_function_factory(
-                'comp_stacked_bar_plot',
-                'Stacked bar plots',
-                'comparative',
-                'Nominal',
-                'Figure'
-            ),
-            $this->python_statistical_function_factory(
-                'comp_grouped_bar_plot',
-                'Grouped bar plots',
-                'comparative',
-                'Nominal',
-                'Figure'
-            ),
-            $this->python_statistical_function_factory(
-                'comp_bubble_chart',
-                'Bubble charts',
-                'comparative',
-                'Nominal',
-                'Figure'
-            ),
-            $this->python_statistical_function_factory(
-                'comp_chi_squared_test',
-                'Chi-squared test',
-                'comparative',
-                'Nominal',
-                'Dataframe'
-            ),
-            $this->python_statistical_function_factory(
-                'comp_shapiro_wilk_test',
-                'Shapiro Wilk\'s correlation test',
-                'descriptive',
-                'Continuous',
-                'Dataframe'
-            ),
-            $this->python_statistical_function_factory(
-                'comp_pearson_cor_test',
-                'Pearson\'s correlation test',
-                'comparative',
-                'Continuous',
-                'Dataframe'
-            ),
-            $this->python_statistical_function_factory(
-                'comp_spearman_cor_test',
-                'Spearman\'s correlation test',
-                'comparative',
-                'Continuous',
-                'Dataframe'
-            )
-        );
-    }
+	/**
+	 * Functions which are used to perform the statistical
+	 * analysis of a given project
+	 */
+	private function python_statistical_functions()
+	{
+		return array(
+			$this->python_statistical_function_factory(
+				'desc_frequency_table',
+				'Frequency tables',
+				'descriptive',
+				'Nominal'
+			),
+			$this->python_statistical_function_factory(
+				'desc_bar_plot',
+				'Bar plots',
+				'descriptive',
+				'Nominal'
+			),
+			$this->python_statistical_function_factory(
+				'desc_statistics',
+				'Statistics',
+				'descriptive',
+				'Continuous'
+			),
+			$this->python_statistical_function_factory(
+				'desc_box_plot',
+				'Box plots',
+				'descriptive',
+				'Continuous'
+			),
+			$this->python_statistical_function_factory(
+				'desc_violin_plot',
+				'Violin plots',
+				'descriptive',
+				'Continuous'
+			),
+			$this->python_statistical_function_factory(
+				'evo_frequency_table',
+				'Frequency tables',
+				'evolutive',
+				'Nominal'
+			),
+			$this->python_statistical_function_factory(
+				'evo_plot',
+				'Evolution plots',
+				'evolutive',
+				'Nominal'
+			),
+			$this->python_statistical_function_factory(
+				'comp_frequency_table',
+				'Frequency tables',
+				'comparative',
+				'Nominal'
+			),
+			$this->python_statistical_function_factory(
+				'comp_stacked_bar_plot',
+				'Stacked bar plots',
+				'comparative',
+				'Nominal'
+			),
+			$this->python_statistical_function_factory(
+				'comp_grouped_bar_plot',
+				'Grouped bar plots',
+				'comparative',
+				'Nominal'
+			),
+			$this->python_statistical_function_factory(
+				'comp_bubble_chart',
+				'Bubble charts',
+				'comparative',
+				'Nominal'
+			),
+			$this->python_statistical_function_factory(
+				'comp_chi_squared_test',
+				'Chi-squared test',
+				'comparative',
+				'Nominal'
+			),
+			$this->python_statistical_function_factory(
+				'comp_shapiro_wilk_test',
+				'Shapiro Wilk\'s correlation test',
+				'descriptive',
+				'Continuous'
+			),
+			$this->python_statistical_function_factory(
+				'comp_pearson_cor_test',
+				'Pearson\'s correlation test',
+				'comparative',
+				'Continuous'
+			),
+			$this->python_statistical_function_factory(
+				'comp_spearman_cor_test',
+				'Spearman\'s correlation test',
+				'comparative',
+				'Continuous'
+			)
+		);
+	}
 
-    /**
-     * Abstract the creation of statistics for the analysis of classfication data
-     */
-    private function python_statistical_function_factory(
-        $name,
-        $title,
-        $type,
-        $data_type,
-        $return_type
-    ) {
-        return array(
-            'name' => $name,
-            'title' => $title,
-            'type' => $type,
-            'data_type' => $data_type,
-            'return_data_type' => $return_type,
-        );
-    }
+	/**
+	 * Abstract the creation of statistics for the analysis of classfication data
+	*/
+	private function python_statistical_function_factory($name, $title, $type,
+	$data_type)
+	{
+		return array(
+			'name' => $name,
+			'title' => $title,
+			'type' => $type,
+			'data_type' => $data_type
+		);
+	}
 
     /**
      * Deletes obsolete fields from the classification data
